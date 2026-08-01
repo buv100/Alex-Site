@@ -1,0 +1,5 @@
+1:"$Sreact.fragment"
+2:I[97367,["/Alex-Site/_next/static/chunks/1g_m1tsgq4dig.js","/Alex-Site/_next/static/chunks/14mrh2-p_w84d.js"],"OutletBoundary"]
+3:"$Sreact.suspense"
+0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"mx-auto max-w-3xl px-4 py-12 text-text-muted","children":[["$","h1",null,{"className":"font-display text-4xl text-accent","children":"דיסקליימר"}],["$","div",null,{"className":"mt-8 space-y-4 leading-relaxed","children":[["$","p",null,{"children":["המידע באתר ","אלכס נכסים",", לרבות מחירים, זמינות ותיאורי נכסים, מוצג לצורכי מידע כללי בלבד וכפוף לשינויים. אין לראות בו הצעה מחייבת או ייעוץ משפטי / שמאי."]}],["$","p",null,{"children":"כתובות מוצגות עד רמת שם רחוב בלבד. פרטים מדויקים נמסרים בתיאום עם אלכס."}],["$","p",null,{"children":"עסקאות מתבצעות רק באמצעות אלכס ובכפוף להוראות הדין, לרבות חוק המתווכים במקרקעין."}]]}]]}],null,["$","$L2",null,{"children":["$","$3",null,{"name":"Next.MetadataOutlet","children":"$@4"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"V-DT1YpvSWZon1tNX0hyD"}
+4:null
