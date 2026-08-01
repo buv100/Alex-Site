@@ -126,7 +126,9 @@ const defaultState = (): PersistedState => ({
 
 export function DemoProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<PersistedState>(defaultState);
-  const [ready, setReady] = useState(false);
+  /** Seed data is available immediately so the UI never blocks on "טוען…" */
+  const [ready, setReady] = useState(true);
+  const [hydrated, setHydrated] = useState(false);
   const [passwords, setPasswords] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -147,18 +149,23 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         if (parsed.passwords) setPasswords(parsed.passwords);
       }
     } catch {
-      /* ignore */
+      /* ignore private mode / blocked storage */
     }
     setReady(true);
+    setHydrated(true);
   }, []);
 
   useEffect(() => {
-    if (!ready) return;
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ ...state, passwords }),
-    );
-  }, [state, passwords, ready]);
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ ...state, passwords }),
+      );
+    } catch {
+      /* ignore */
+    }
+  }, [state, passwords, hydrated]);
 
   const persist = useCallback((updater: (prev: PersistedState) => PersistedState) => {
     setState(updater);

@@ -3,16 +3,21 @@
 import { useMemo } from "react";
 import { useDemo } from "@/components/providers/DemoProvider";
 import { PropertyCard } from "@/components/property/PropertyCard";
+import { isListedPublicly, toPublicProperty } from "@/lib/property-public";
 
 export function HomeListings() {
-  const { ready, getPublicListings } = useDemo();
-  const items = useMemo(() => {
-    if (!ready) return [];
-    return getPublicListings().slice(0, 3);
-  }, [ready, getPublicListings]);
+  const { properties } = useDemo();
+  const items = useMemo(
+    () =>
+      properties
+        .filter(isListedPublicly)
+        .map(toPublicProperty)
+        .slice(0, 3),
+    [properties],
+  );
 
-  if (!ready) {
-    return <p className="text-text-muted">טוען נכסים…</p>;
+  if (items.length === 0) {
+    return <p className="text-text-muted">אין נכסים להצגה כרגע.</p>;
   }
 
   return (
