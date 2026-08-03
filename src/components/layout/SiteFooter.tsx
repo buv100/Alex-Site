@@ -31,9 +31,6 @@ export function SiteFooter() {
           <Link href="/disclaimer" className="text-text-muted hover:text-accent">
             דיסקליימר
           </Link>
-          <Link href="/admin/login" className="mt-2 text-xs text-text-muted/60">
-            כניסת מנהל
-          </Link>
         </div>
       </div>
       <div className="border-t border-border px-4 py-4 text-center text-xs text-text-muted">

@@ -1,52 +1,38 @@
 # אלכס נכסים
 
-אתר תיווך אישי לירושלים.
+תיווך דירות בירושלים — אתר למשתמשים / לקוחות.
 
-## הרצה מקומית
+## פתיחת האתר (צד משתמש בלבד)
+
+**https://alex-nekasim.vercel.app**
+
+הקישור מתעדכן אחרי כל פרסום.  
+אין כאן כניסת מנהל לאלכס — רק גלישת נכסים, יצירת קשר ומועדפים.
+
+---
+
+## הרצה מקומית (פיתוח)
 
 ```bash
 npm install
-cp .env.example .env.local   # מלאו ערכים ל־Phase 2
+cp .env.example .env.local
 npm run dev
 ```
 
-פתחו http://localhost:3000
+http://localhost:3000
+
+אדמין של אלכס זמין **רק מקומית** (או עם `ENABLE_ADMIN=true`), לא בקישור הציבורי.
 
 ### מצבי עבודה
 
 | מצב | מתי | התנהגות |
 |-----|-----|---------|
-| **דמו** | אין `MONGODB_URI` | נתונים ב־localStorage (Phase 1) |
-| **שרת** | יש `MONGODB_URI` | MongoDB + Auth.js + העלאת תמונות |
+| **דמו** | אין `MONGODB_URI` | נתונים ב־localStorage |
+| **שרת** | יש `MONGODB_URI` | MongoDB + Auth + העלאת תמונות |
 
-## Phase 2 — מה להגדיר ב־`.env.local`
+## Phase 2 — env
 
 ראו [`.env.example`](.env.example) ו־[`docs/DATA_CHECKLIST.md`](docs/DATA_CHECKLIST.md).
-
-מינימום:
-- `MONGODB_URI`
-- `AUTH_SECRET` (מחרוזת ארוכה אקראית)
-- `ADMIN_USERNAME` + `ADMIN_PASSWORD`
-- Cloudinary (`CLOUDINARY_*`) להעלאה מהטלפון
-
-אחרי חיבור Mongo, זריעת נתוני דמו (פעם אחת):
-
-```bash
-curl -X POST http://localhost:3000/api/seed -H "x-seed-secret: YOUR_SEED_SECRET"
-```
-
-(או התחברות כאדמין ואז קריאה ל־`/api/seed`)
-
-## אדמין
-
-- `/admin/login`
-- דמו מקומי: `alex` / `alex-demo-2026`
-- בפרודקשן: לפי `ADMIN_*` ב־env
-
-## דיפלוי
-
-הקוד ב־GitHub. ל־Phase 2 (שרת + DB) צריך אחסון עם Node — מומלץ **Vercel Free** שמחובר לריפו.  
-GitHub Pages מתאים רק לדמו סטטי (Phase 1).
 
 ## מסמכים
 
