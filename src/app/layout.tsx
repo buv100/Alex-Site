@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Frank_Ruhl_Libre, Heebo } from "next/font/google";
+import { AuthProvider } from "@/components/providers/AuthProvider";
 import { DemoProvider } from "@/components/providers/DemoProvider";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
@@ -36,7 +37,9 @@ export default function RootLayout({
       className={`${frank.variable} ${heebo.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-bg text-text">
-        <DemoProvider>{children}</DemoProvider>
+        <AuthProvider>
+          <DemoProvider>{children}</DemoProvider>
+        </AuthProvider>
       </body>
     </html>
   );

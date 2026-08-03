@@ -63,12 +63,12 @@ export function PropertyForm({ initial }: { initial: Property }) {
     });
   }
 
-  function onSave() {
+  async function onSave() {
     const next =
       form.status === "published" && form.images.length < 1
         ? { ...form, status: "draft" as const }
         : form;
-    const res = saveProperty(next);
+    const res = await saveProperty(next);
     if (!res.ok) {
       setMsg(t.cannotPublishNoImage);
       return;
@@ -77,13 +77,13 @@ export function PropertyForm({ initial }: { initial: Property }) {
     setMsg(t.saved);
   }
 
-  function onPublish() {
+  async function onPublish() {
     if (form.images.length < 1) {
       setMsg(t.cannotPublishNoImage);
       return;
     }
     const next = { ...form, status: "published" as const };
-    const res = saveProperty(next);
+    const res = await saveProperty(next);
     if (!res.ok) {
       setMsg(t.cannotPublishNoImage);
       return;
@@ -323,6 +323,52 @@ export function PropertyForm({ initial }: { initial: Property }) {
       <section className="space-y-3 rounded border border-border bg-bg-elevated p-4">
         <h2 className="font-display text-xl text-accent">{t.images}</h2>
         <p className="text-xs text-text-muted">{t.uploadHint}</p>
+        <div className="field">
+          <label htmlFor="img-file">העלאה מהגלריה (Cloudinary)</label>
+          <input
+            id="img-file"
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              setMsg("מעלה תמונה…");
+              try {
+                const body = new FormData();
+                body.append("file", file);
+                const res = await fetch("/api/upload", {
+                  method: "POST",
+                  body,
+                });
+                if (!res.ok) {
+                  const err = await res.json().catch(() => ({}));
+                  setMsg(
+                    (err as { error?: string }).error ||
+                      "העלאה נכשלה — נסו קישור URL",
+                  );
+                  return;
+                }
+                const data = (await res.json()) as { url: string };
+                setForm((f) => ({
+                  ...f,
+                  images: [
+                    ...f.images,
+                    {
+                      url: data.url,
+                      alt: imageAlt.trim() || f.title || "תמונת נכס",
+                      order: f.images.length,
+                    },
+                  ],
+                }));
+                setMsg(t.saved);
+              } catch {
+                setMsg("העלאה נכשלה");
+              }
+              e.target.value = "";
+            }}
+          />
+        </div>
         <div className="field">
           <label htmlFor="img-url">{t.addImageUrl}</label>
           <input

@@ -35,13 +35,17 @@ interface PersistedState {
 
 interface DemoContextValue {
   ready: boolean;
+  serverMode: boolean;
   properties: Property[];
   leads: Lead[];
   adminLoggedIn: boolean;
   adminLocale: AdminLocale;
   setAdminLocale: (l: AdminLocale) => void;
   loginAdmin: (username: string, password: string) => boolean;
+  /** Mark admin UI session after successful next-auth */
+  markAdminLoggedIn: () => void;
   logoutAdmin: () => void;
+  refreshFromServer: () => Promise<void>;
   currentUser: PublicUser | null;
   registerUser: (data: {
     name: string;
@@ -56,13 +60,22 @@ interface DemoContextValue {
   getArchiveListings: () => ReturnType<typeof toPublicProperty>[];
   getPropertyById: (id: string) => Property | undefined;
   getPublicPropertyById: (id: string) => ReturnType<typeof toPublicProperty> | undefined;
-  saveProperty: (property: Property) => { ok: true } | { ok: false; error: string };
+  saveProperty: (
+    property: Property,
+  ) =>
+    | { ok: true }
+    | { ok: false; error: string }
+    | Promise<{ ok: true } | { ok: false; error: string }>;
   createPropertyDraft: (partial?: Partial<Property>) => Property;
   createProperty: (partial?: Partial<Property>) => Property;
   setPropertyStatus: (id: string, status: PropertyStatus) => { ok: true } | { ok: false; error: string };
   softDeleteProperty: (id: string) => void;
   restoreProperty: (id: string) => void;
-  addLead: (lead: Omit<Lead, "id" | "createdAt" | "updatedAt" | "status"> & { status?: LeadStatus }) => void;
+  addLead: (
+    lead: Omit<Lead, "id" | "createdAt" | "updatedAt" | "status"> & {
+      status?: LeadStatus;
+    },
+  ) => void | Promise<void>;
   updateLeadStatus: (id: string, status: LeadStatus) => void;
   resetDemoData: () => void;
 }
@@ -129,34 +142,90 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   /** Seed data is available immediately so the UI never blocks on "טוען…" */
   const [ready, setReady] = useState(true);
   const [hydrated, setHydrated] = useState(false);
+  const [serverMode, setServerMode] = useState(false);
   const [passwords, setPasswords] = useState<Record<string, string>>({});
 
-  useEffect(() => {
+  const refreshFromServer = useCallback(async () => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as PersistedState & {
-          passwords?: Record<string, string>;
-        };
-        setState({
-          properties: parsed.properties?.length ? parsed.properties : seedProperties,
-          leads: parsed.leads ?? seedLeads,
-          users: parsed.users ?? [],
-          adminLoggedIn: Boolean(parsed.adminLoggedIn),
-          adminLocale: parsed.adminLocale === "ru" ? "ru" : "he",
-          currentUserId: parsed.currentUserId ?? null,
-        });
-        if (parsed.passwords) setPasswords(parsed.passwords);
-      }
+      const [pubRes, adminRes, leadsRes] = await Promise.all([
+        fetch("/api/properties?scope=public"),
+        fetch("/api/properties?scope=admin"),
+        fetch("/api/leads"),
+      ]);
+      const pub = pubRes.ok ? await pubRes.json() : { properties: [] };
+      const adm = adminRes.ok ? await adminRes.json() : null;
+      const leadsJson = leadsRes.ok ? await leadsRes.json() : { leads: [] };
+
+      setState((prev) => ({
+        ...prev,
+        properties: adm?.properties?.length
+          ? adm.properties
+          : pub.properties?.length
+            ? pub.properties
+            : prev.properties,
+        leads: leadsJson.leads?.length ? leadsJson.leads : prev.leads,
+      }));
     } catch {
-      /* ignore private mode / blocked storage */
+      /* keep local */
     }
-    setReady(true);
-    setHydrated(true);
   }, []);
 
   useEffect(() => {
-    if (!hydrated) return;
+    let cancelled = false;
+
+    async function boot() {
+      try {
+        const healthRes = await fetch("/api/health");
+        const health = healthRes.ok
+          ? ((await healthRes.json()) as { mode?: string })
+          : null;
+
+        if (!cancelled && health?.mode === "server") {
+          setServerMode(true);
+          await refreshFromServer();
+          setHydrated(true);
+          setReady(true);
+          return;
+        }
+      } catch {
+        /* demo mode */
+      }
+
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw && !cancelled) {
+          const parsed = JSON.parse(raw) as PersistedState & {
+            passwords?: Record<string, string>;
+          };
+          setState({
+            properties: parsed.properties?.length
+              ? parsed.properties
+              : seedProperties,
+            leads: parsed.leads ?? seedLeads,
+            users: parsed.users ?? [],
+            adminLoggedIn: Boolean(parsed.adminLoggedIn),
+            adminLocale: parsed.adminLocale === "ru" ? "ru" : "he",
+            currentUserId: parsed.currentUserId ?? null,
+          });
+          if (parsed.passwords) setPasswords(parsed.passwords);
+        }
+      } catch {
+        /* ignore private mode / blocked storage */
+      }
+      if (!cancelled) {
+        setReady(true);
+        setHydrated(true);
+      }
+    }
+
+    void boot();
+    return () => {
+      cancelled = true;
+    };
+  }, [refreshFromServer]);
+
+  useEffect(() => {
+    if (!hydrated || serverMode) return;
     try {
       localStorage.setItem(
         STORAGE_KEY,
@@ -165,7 +234,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     } catch {
       /* ignore */
     }
-  }, [state, passwords, hydrated]);
+  }, [state, passwords, hydrated, serverMode]);
 
   const persist = useCallback((updater: (prev: PersistedState) => PersistedState) => {
     setState(updater);
@@ -178,11 +247,13 @@ export function DemoProvider({ children }: { children: ReactNode }) {
 
   const value: DemoContextValue = {
     ready,
+    serverMode,
     properties: state.properties,
     leads: state.leads,
     adminLoggedIn: state.adminLoggedIn,
     adminLocale: state.adminLocale,
     setAdminLocale: (l) => persist((p) => ({ ...p, adminLocale: l })),
+    refreshFromServer,
     loginAdmin: (username, password) => {
       const ok =
         username.trim() === DEMO_ADMIN.username &&
@@ -190,6 +261,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       if (ok) persist((p) => ({ ...p, adminLoggedIn: true }));
       return ok;
     },
+    markAdminLoggedIn: () => persist((p) => ({ ...p, adminLoggedIn: true })),
     logoutAdmin: () => persist((p) => ({ ...p, adminLoggedIn: false })),
     currentUser,
     registerUser: ({ name, phone, password, privacyConsent }) => {
@@ -253,12 +325,42 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       if (isListedPublicly(p) || isArchivedPublicly(p)) return toPublicProperty(p);
       return undefined;
     },
-    saveProperty: (property) => {
+    saveProperty: async (property) => {
       const now = new Date().toISOString();
       const next = { ...property, updatedAt: now };
       if (next.status === "published" && next.images.length < 1) {
         return { ok: false, error: "cannot_publish_no_image" };
       }
+
+      if (serverMode) {
+        const isMongoId = /^[a-f\d]{24}$/i.test(next.id);
+        const res = await fetch(
+          isMongoId ? `/api/properties/${next.id}` : "/api/properties",
+          {
+            method: isMongoId ? "PUT" : "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(next),
+          },
+        );
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          return { ok: false, error: (err as { error?: string }).error || "save_failed" };
+        }
+        const data = await res.json();
+        const saved = data.property as Property;
+        persist((p) => ({
+          ...p,
+          properties: p.properties.some(
+            (x) => x.id === next.id || x.id === saved.id,
+          )
+            ? p.properties.map((x) =>
+                x.id === next.id || x.id === saved.id ? saved : x,
+              )
+            : [...p.properties, saved],
+        }));
+        return { ok: true };
+      }
+
       persist((p) => ({
         ...p,
         properties: p.properties.some((x) => x.id === next.id)
@@ -282,20 +384,25 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         return { ok: false, error: "cannot_publish_no_image" };
       }
       const now = new Date().toISOString();
+      const updated = {
+        ...prop,
+        status,
+        updatedAt: now,
+        publishedAt: status === "published" ? now : prop.publishedAt,
+        archivedAt:
+          status === "sold" || status === "rented" ? now : prop.archivedAt,
+      };
       persist((p) => ({
         ...p,
-        properties: p.properties.map((x) => {
-          if (x.id !== id) return x;
-          return {
-            ...x,
-            status,
-            updatedAt: now,
-            publishedAt: status === "published" ? now : x.publishedAt,
-            archivedAt:
-              status === "sold" || status === "rented" ? now : x.archivedAt,
-          };
-        }),
+        properties: p.properties.map((x) => (x.id === id ? updated : x)),
       }));
+      if (serverMode) {
+        void fetch(`/api/properties/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updated),
+        });
+      }
       return { ok: true };
     },
     softDeleteProperty: (id) => {
@@ -306,6 +413,9 @@ export function DemoProvider({ children }: { children: ReactNode }) {
           x.id === id ? { ...x, deletedAt: now, updatedAt: now } : x,
         ),
       }));
+      if (serverMode) {
+        void fetch(`/api/properties/${id}`, { method: "DELETE" });
+      }
     },
     restoreProperty: (id) => {
       persist((p) => ({
@@ -317,7 +427,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         ),
       }));
     },
-    addLead: (lead) => {
+    addLead: async (lead) => {
       const now = new Date().toISOString();
       const full: Lead = {
         ...lead,
@@ -327,6 +437,13 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         updatedAt: now,
       };
       persist((p) => ({ ...p, leads: [full, ...p.leads] }));
+      if (serverMode) {
+        await fetch("/api/leads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(full),
+        });
+      }
     },
     updateLeadStatus: (id, status) => {
       persist((p) => ({
@@ -337,6 +454,13 @@ export function DemoProvider({ children }: { children: ReactNode }) {
             : l,
         ),
       }));
+      if (serverMode) {
+        void fetch(`/api/leads/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+        });
+      }
     },
     resetDemoData: () => {
       setPasswords({});

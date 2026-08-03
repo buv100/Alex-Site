@@ -1,39 +1,55 @@
 # אלכס נכסים
 
-אתר תיווך אישי — Phase 1 דמו (ללא DB אמיתי).
+אתר תיווך אישי לירושלים.
 
 ## הרצה מקומית
 
 ```bash
 npm install
+cp .env.example .env.local   # מלאו ערכים ל־Phase 2
 npm run dev
 ```
 
-פתחו [http://localhost:3000](http://localhost:3000).
+פתחו http://localhost:3000
 
-## פרסום ב־GitHub Pages
+### מצבי עבודה
 
-אחרי push ל־`main`, Actions בונה ומפרסם את האתר.
-כתובת לדוגמה: `https://<username>.github.io/<repo-name>/`
+| מצב | מתי | התנהגות |
+|-----|-----|---------|
+| **דמו** | אין `MONGODB_URI` | נתונים ב־localStorage (Phase 1) |
+| **שרת** | יש `MONGODB_URI` | MongoDB + Auth.js + העלאת תמונות |
 
-ב־GitHub: **Settings → Pages → Source = GitHub Actions**.
+## Phase 2 — מה להגדיר ב־`.env.local`
 
-## כניסת אדמין (דמו)
+ראו [`.env.example`](.env.example) ו־[`docs/DATA_CHECKLIST.md`](docs/DATA_CHECKLIST.md).
 
-- נתיב: `/admin/login`
-- משתמש: `alex`
-- סיסמה: `alex-demo-2026`
+מינימום:
+- `MONGODB_URI`
+- `AUTH_SECRET` (מחרוזת ארוכה אקראית)
+- `ADMIN_USERNAME` + `ADMIN_PASSWORD`
+- Cloudinary (`CLOUDINARY_*`) להעלאה מהטלפון
 
-האדמין מותאם למובייל וכולל מתג שפה עברית/רוסית.
+אחרי חיבור Mongo, זריעת נתוני דמו (פעם אחת):
+
+```bash
+curl -X POST http://localhost:3000/api/seed -H "x-seed-secret: YOUR_SEED_SECRET"
+```
+
+(או התחברות כאדמין ואז קריאה ל־`/api/seed`)
+
+## אדמין
+
+- `/admin/login`
+- דמו מקומי: `alex` / `alex-demo-2026`
+- בפרודקשן: לפי `ADMIN_*` ב־env
+
+## דיפלוי
+
+הקוד ב־GitHub. ל־Phase 2 (שרת + DB) צריך אחסון עם Node — מומלץ **Vercel Free** שמחובר לריפו.  
+GitHub Pages מתאים רק לדמו סטטי (Phase 1).
 
 ## מסמכים
 
-- [docs/SPEC.md](docs/SPEC.md) — אפיון
-- [docs/PROJECT_RULES.md](docs/PROJECT_RULES.md) — חוקי עבודה
-- [docs/DATA_CHECKLIST.md](docs/DATA_CHECKLIST.md) — מה להעביר לתוכן אמיתי
-
-## הערות דמו
-
-- הנתונים נשמרים ב־`localStorage` בדפדפן.
-- תמונות בדמו דרך picsum / קישורי URL.
-- פרטי קשר ורישיון הם placeholders עד מילוי ה־checklist.
+- [docs/SPEC.md](docs/SPEC.md)
+- [docs/PROJECT_RULES.md](docs/PROJECT_RULES.md)
+- [docs/DATA_CHECKLIST.md](docs/DATA_CHECKLIST.md)
