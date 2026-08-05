@@ -20,7 +20,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const t = getAdminDict(adminLocale);
   const pathname = usePathname();
   const router = useRouter();
-  const isLogin = pathname === "/admin/login";
+  const isLogin =
+    pathname === "/admin/login" || pathname.startsWith("/admin/g/");
   const isAdminSession = session?.user?.role === "admin";
   const allowed = adminLoggedIn || isAdminSession;
 

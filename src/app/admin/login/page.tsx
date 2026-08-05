@@ -20,12 +20,16 @@ function AdminLoginForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Strip access token / path unlock leftovers from the address bar after gate cookie is set.
+  // Clean the address bar WITHOUT a new navigation (router.replace would
+  // re-hit middleware without the unlock token and bounce to home).
   useEffect(() => {
-    if (searchParams.get("access") || window.location.pathname.startsWith("/admin/g/")) {
-      router.replace("/admin/login");
+    const dirty =
+      searchParams.get("access") ||
+      window.location.pathname.startsWith("/admin/g/");
+    if (dirty && window.location.pathname + window.location.search !== "/admin/login") {
+      window.history.replaceState(null, "", "/admin/login");
     }
-  }, [searchParams, router]);
+  }, [searchParams]);
 
   useEffect(() => {
     if (adminLoggedIn) router.replace("/admin");
@@ -110,10 +114,6 @@ function AdminLoginForm() {
           {loading ? "…" : t.submitLogin}
         </button>
       </form>
-      <p className="mt-6 text-center text-xs text-text-muted">
-        אם נפתח דף הבית במקום מסך זה — פתחו את הקישור ב־Safari / Chrome (לא
-        מתוך תצוגה מקדימה בוואטסאפ).
-      </p>
     </div>
   );
 }
