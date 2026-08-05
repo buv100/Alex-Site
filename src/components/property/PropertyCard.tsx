@@ -30,12 +30,21 @@ export function PropertyCard({ property }: { property: PublicProperty }) {
               אין תמונה
             </div>
           )}
-          <div className="absolute start-3 top-3 flex flex-wrap gap-2">
-            <span className="tag bg-bg/80 backdrop-blur">{dealTypeLabel(property.dealType)}</span>
+          {/* Scrim so labels stay readable on any photo */}
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/55 to-transparent"
+            aria-hidden
+          />
+          <div className="absolute start-3 top-3 z-10 flex flex-wrap gap-2">
+            <span className="tag-on-media tag-on-media--deal">
+              {dealTypeLabel(property.dealType)}
+            </span>
             {property.isOpportunity && (
-              <span className="tag border-accent">בהזדמנות</span>
+              <span className="tag-on-media tag-on-media--hot">בהזדמנות</span>
             )}
-            {property.isExclusive && <span className="tag">בלעדיות</span>}
+            {property.isExclusive && (
+              <span className="tag-on-media">בלעדיות</span>
+            )}
           </div>
         </div>
         <div className="space-y-2 p-4">
