@@ -23,6 +23,16 @@ export function sharePropertyMessage(opts: {
 ${opts.url}`;
 }
 
+export function leadReplyMessage(opts: {
+  name: string;
+  propertyTitle?: string | null;
+}): string {
+  const about = opts.propertyTitle
+    ? ` לגבי הנכס «${opts.propertyTitle}»`
+    : "";
+  return `שלום ${opts.name},${about} כאן אלכס מאלכס נכסים.`;
+}
+
 export function generalWhatsAppMessage(): string {
   return "שלום אלכס, אשמח ליצור קשר לגבי נדל״ן בירושלים.";
 }
