@@ -22,7 +22,7 @@ import { shuffle } from "@/lib/format";
 import type { AdminLocale } from "@/lib/i18n/admin";
 import { DEMO_ADMIN } from "@/lib/site";
 
-const STORAGE_KEY = "alex-nekasim-demo-v1";
+const STORAGE_KEY = "alex-nekasim-demo-v2";
 
 interface PersistedState {
   properties: Property[];
@@ -198,10 +198,8 @@ export function DemoProvider({ children }: { children: ReactNode }) {
             passwords?: Record<string, string>;
           };
           setState({
-            properties: parsed.properties?.length
-              ? parsed.properties
-              : seedProperties,
-            leads: parsed.leads ?? seedLeads,
+            properties: parsed.properties ?? [],
+            leads: parsed.leads ?? [],
             users: parsed.users ?? [],
             adminLoggedIn: Boolean(parsed.adminLoggedIn),
             adminLocale: parsed.adminLocale === "ru" ? "ru" : "he",

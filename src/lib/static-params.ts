@@ -1,6 +1,4 @@
-import { seedProperties } from "@/data/seed";
-
-/** Pre-render seed + common demo IDs for static GitHub Pages export */
-export function propertyStaticParams() {
-  return seedProperties.map((p) => ({ id: p.id }));
+/** Dynamic property routes — no prebuilt demo IDs */
+export function propertyStaticParams(): { id: string }[] {
+  return [];
 }

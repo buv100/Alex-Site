@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { connectDb } from "@/lib/db";
 import { PropertyModel } from "@/lib/models/Property";
 import { LeadModel } from "@/lib/models/Lead";
-import { seedLeads, seedProperties } from "@/data/seed";
+import { demoCatalogLeads, demoCatalogProperties } from "@/data/demo-catalog";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -27,7 +27,7 @@ export async function POST(req: Request) {
       });
     }
 
-    for (const p of seedProperties) {
+    for (const p of demoCatalogProperties) {
       const { id: _id, createdAt, updatedAt, ...rest } = p;
       await PropertyModel.create({
         ...rest,
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
       });
     }
 
-    for (const l of seedLeads) {
+    for (const l of demoCatalogLeads) {
       const { id: _id, createdAt, updatedAt, propertyId, ...rest } = l;
       await LeadModel.create({
         ...rest,
