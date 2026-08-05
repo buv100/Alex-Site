@@ -89,7 +89,13 @@ export default function PropertyDetailClient() {
                   onClick={() => setActiveImg(i)}
                   aria-label={`תמונה ${i + 1}`}
                 >
-                  <Image src={img.url} alt="" fill className="object-cover" sizes="96px" />
+                  <Image
+                    src={img.url}
+                    alt={`תמונה ${i + 1} מתוך ${property.images.length} — ${property.title}`}
+                    fill
+                    className="object-cover"
+                    sizes="96px"
+                  />
                 </button>
               ))}
             </div>

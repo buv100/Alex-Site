@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
+import { licenseDisplay } from "@/lib/legal-display";
 
 export const metadata = { title: "על אלכס" };
 
@@ -16,9 +17,7 @@ export default function AboutPage() {
           <li key={item}>{item}</li>
         ))}
       </ul>
-      <p className="mt-8 text-sm text-text-muted">
-        רישיון תיווך: {siteConfig.licenseNumber}
-      </p>
+      <p className="mt-8 text-sm text-text-muted">{licenseDisplay()}</p>
       <Link href="/contact" className="btn btn-primary mt-8">
         צור קשר
       </Link>

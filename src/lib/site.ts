@@ -17,11 +17,16 @@ export const siteConfig = {
   phoneTel: "+972500000000",
   whatsapp: "972500000000",
   email: "leads@alex-nekasim.demo",
-  licenseNumber: "מס׳ רישיון יועבר בהמשך",
+  /** Placeholders until DATA_CHECKLIST is filled */
+  licenseNumber: null as string | null,
+  licenseHolderName: null as string | null,
+  dataControllerName: "אלכס (פרטים מלאים יושלמו)",
+  privacyRequestsEmail: "leads@alex-nekasim.demo",
+  legalDraftUpdatedAt: "2026-08-05",
   city: "ירושלים",
   accessibilityCoordinator: {
-    name: "יועבר בהמשך",
-    phone: "050-000-0000",
+    name: null as string | null,
+    phone: null as string | null,
     email: "accessibility@alex-nekasim.demo",
   },
   neighborhoods: [

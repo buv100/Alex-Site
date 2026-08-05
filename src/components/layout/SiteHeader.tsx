@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { siteConfig } from "@/lib/site";
 import { useDemo } from "@/components/providers/DemoProvider";
 
@@ -16,6 +16,23 @@ const links = [
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const { currentUser } = useDemo();
+  const menuId = useId();
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setOpen(false);
+        buttonRef.current?.focus();
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    const firstLink = navRef.current?.querySelector<HTMLElement>("a");
+    firstLink?.focus();
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-bg/90 backdrop-blur-md">
@@ -46,10 +63,12 @@ export function SiteHeader() {
         </nav>
 
         <button
+          ref={buttonRef}
           type="button"
           className="btn btn-ghost min-h-11 px-3 md:hidden"
           aria-expanded={open}
-          aria-controls="mobile-nav"
+          aria-controls={menuId}
+          aria-label={open ? "סגירת תפריט" : "פתיחת תפריט"}
           onClick={() => setOpen((v) => !v)}
         >
           {open ? "סגור" : "תפריט"}
@@ -58,7 +77,8 @@ export function SiteHeader() {
 
       {open && (
         <nav
-          id="mobile-nav"
+          ref={navRef}
+          id={menuId}
           className="border-t border-border px-4 py-3 md:hidden"
           aria-label="תפריט נייד"
         >

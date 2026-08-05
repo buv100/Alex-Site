@@ -68,6 +68,33 @@ a {
   outline-offset: 3px;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-fade-up,
+  .animate-fade-up-delay {
+    animation: none !important;
+  }
+
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
 .skip-link {
   position: absolute;
   inset-inline-start: 1rem;
@@ -157,11 +184,12 @@ a {
   resize: vertical;
 }
 
-.field input:focus,
-.field select:focus,
-.field textarea:focus {
+.field input:focus-visible,
+.field select:focus-visible,
+.field textarea:focus-visible {
   border-color: var(--accent);
-  outline: none;
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
   box-shadow: 0 0 0 2px var(--accent-dim);
 }
 

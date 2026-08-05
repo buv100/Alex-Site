@@ -18,6 +18,7 @@ export default function LoginPage() {
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError("");
     const res = loginUser(phone, password);
     if (!res.ok) {
       setError(res.error);
@@ -29,15 +30,19 @@ export default function LoginPage() {
   return (
     <div className="mx-auto max-w-md px-4 py-12">
       <h1 className="font-display text-3xl text-accent">התחברות</h1>
-      <form onSubmit={onSubmit} className="mt-8 space-y-4">
+      <form onSubmit={onSubmit} className="mt-8 space-y-4" noValidate>
         <div className="field">
           <label htmlFor="login-phone">טלפון</label>
           <input
             id="login-phone"
             type="tel"
+            inputMode="tel"
+            autoComplete="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             required
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? "login-error" : undefined}
           />
         </div>
         <div className="field">
@@ -45,13 +50,16 @@ export default function LoginPage() {
           <input
             id="login-pass"
             type="password"
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? "login-error" : undefined}
           />
         </div>
         {error && (
-          <p className="text-sm text-danger" role="alert">
+          <p id="login-error" className="text-sm text-danger" role="alert">
             {error}
           </p>
         )}

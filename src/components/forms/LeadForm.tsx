@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { FormPrivacyNotice } from "@/components/forms/FormPrivacyNotice";
 import { useDemo } from "@/components/providers/DemoProvider";
 import type { LeadType } from "@/lib/types";
 
@@ -27,6 +28,9 @@ export function LeadForm({
   const [consent, setConsent] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
+
+  const errorId = `lead-error-${type}`;
+  const noticeId = `lead-privacy-notice-${type}`;
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -75,10 +79,19 @@ export function LeadForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4" noValidate>
+    <form
+      onSubmit={onSubmit}
+      className="space-y-4"
+      noValidate
+      aria-describedby={noticeId}
+    >
       <h3 className="font-display text-xl text-accent">{title}</h3>
+      <FormPrivacyNotice purpose="lead" id={noticeId} />
       <div className="field">
-        <label htmlFor={`lead-name-${type}`}>שם מלא</label>
+        <label htmlFor={`lead-name-${type}`}>
+          שם מלא <span aria-hidden="true">*</span>
+          <span className="sr-only"> (שדה חובה)</span>
+        </label>
         <input
           id={`lead-name-${type}`}
           name="name"
@@ -86,10 +99,15 @@ export function LeadForm({
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
+          aria-invalid={Boolean(error && !name.trim())}
+          aria-describedby={error ? errorId : undefined}
         />
       </div>
       <div className="field">
-        <label htmlFor={`lead-phone-${type}`}>טלפון</label>
+        <label htmlFor={`lead-phone-${type}`}>
+          טלפון <span aria-hidden="true">*</span>
+          <span className="sr-only"> (שדה חובה)</span>
+        </label>
         <input
           id={`lead-phone-${type}`}
           name="phone"
@@ -99,6 +117,8 @@ export function LeadForm({
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           required
+          aria-invalid={Boolean(error && !phone.trim())}
+          aria-describedby={error ? errorId : undefined}
         />
       </div>
       <div className="field">
@@ -116,6 +136,8 @@ export function LeadForm({
           className="mt-1 size-5 shrink-0"
           checked={consent}
           onChange={(e) => setConsent(e.target.checked)}
+          aria-invalid={Boolean(error && !consent)}
+          aria-describedby={error ? errorId : undefined}
         />
         <span>
           אני מאשר/ת כי הפרטים שמסרתי ייאספו ויעובדו בהתאם ל
@@ -126,7 +148,7 @@ export function LeadForm({
         </span>
       </label>
       {error && (
-        <p className="text-sm text-danger" role="alert">
+        <p id={errorId} className="text-sm text-danger" role="alert">
           {error}
         </p>
       )}

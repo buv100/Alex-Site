@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
+import { licenseDisplay } from "@/lib/legal-display";
 
 export function SiteFooter() {
   return (
@@ -8,11 +9,16 @@ export function SiteFooter() {
         <div>
           <p className="font-display text-2xl text-accent">{siteConfig.brandName}</p>
           <p className="mt-2 max-w-sm text-sm text-text-muted">{siteConfig.tagline}</p>
-          <p className="mt-4 text-sm text-text-muted">
-            רישיון תיווך: {siteConfig.licenseNumber}
+          <p className="mt-4 text-sm text-text-muted">{licenseDisplay()}</p>
+          <p className="mt-3 max-w-md text-xs leading-relaxed text-text-muted">
+            מחירים וזמינות כפופים לשינוי. המידע באתר אינו הצעה מחייבת. ראו{" "}
+            <Link href="/disclaimer" className="text-accent underline">
+              דיסקליימר
+            </Link>
+            .
           </p>
         </div>
-        <div className="flex flex-col gap-2 text-sm">
+        <nav className="flex flex-col gap-2 text-sm" aria-label="קישורים משפטיים וניווט">
           <a href={`tel:${siteConfig.phoneTel}`} className="text-accent hover:underline">
             {siteConfig.phone}
           </a>
@@ -21,6 +27,9 @@ export function SiteFooter() {
           </Link>
           <Link href="/privacy" className="text-text-muted hover:text-accent">
             מדיניות פרטיות
+          </Link>
+          <Link href="/cookies" className="text-text-muted hover:text-accent">
+            מדיניות עוגיות
           </Link>
           <Link href="/terms" className="text-text-muted hover:text-accent">
             תנאי שימוש
@@ -31,7 +40,7 @@ export function SiteFooter() {
           <Link href="/disclaimer" className="text-text-muted hover:text-accent">
             דיסקליימר
           </Link>
-        </div>
+        </nav>
       </div>
       <div className="border-t border-border px-4 py-4 text-center text-xs text-text-muted">
         © {new Date().getFullYear()} {siteConfig.brandName}. כל הזכויות שמורות.
