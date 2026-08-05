@@ -20,9 +20,9 @@ function AdminLoginForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Strip access token from the address bar after the gate cookie is set (middleware).
+  // Strip access token / path unlock leftovers from the address bar after gate cookie is set.
   useEffect(() => {
-    if (searchParams.get("access")) {
+    if (searchParams.get("access") || window.location.pathname.startsWith("/admin/g/")) {
       router.replace("/admin/login");
     }
   }, [searchParams, router]);
