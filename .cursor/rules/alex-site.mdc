@@ -26,3 +26,5 @@ Before changing product behavior, read and follow:
 
 ## Stack lock
 Next.js App Router + TypeScript + Tailwind + managed MongoDB free (`MONGODB_URI`: Atlas M0 / OVH Discovery / Clever Cloud) + Vercel free + Cloudinary/Blob free + Auth.js + wa.me (no WhatsApp Business API in v1).
+
+Do not publish internal-tool entry URLs, passwords, or gate tokens in README, public docs, footer, or chat that may be committed.

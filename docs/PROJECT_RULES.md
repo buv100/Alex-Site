@@ -57,28 +57,27 @@
 ## 4. מבנה פרויקט מומלץ
 
 ```
-app/                 # Next.js App Router — public + admin routes
+app/                 # Next.js App Router — public routes (+ internal app, not linked publicly)
   (public)/
-  admin/
 components/
   ui/                # primitives
   property/
-  admin/
   layout/
 lib/
   auth/
   db/
   validations/
-  i18n/              # admin he/ru
+  i18n/
 models/              # Mongo schemas / types
 public/
-docs/                # SPEC, RULES, CHECKLIST
+docs/                # SPEC, RULES, CHECKLIST (no public entry URLs for internal tools)
 ```
 
 כללים:
-- רכיבי אדמין לא מיובאים לדפים ציבוריים בלי צורך.
+- רכיבי ממשק פנימי לא מיובאים לדפים ציבוריים בלי צורך.
 - גישה לנתונים רק דרך `lib/` / server actions / route handlers — לא קריאות DB ישירות מקומפוננטת UI.
 - ולידציה משותפת (Zod או מקביל) ללקוח ולשרת.
+- **אין** לפרסם ב־GitHub / README קישורי כניסה, סיסמאות או אסימונים לממשק הפנימי.
 
 ---
 

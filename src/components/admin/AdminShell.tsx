@@ -6,7 +6,6 @@ import { useEffect } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { useDemo } from "@/components/providers/DemoProvider";
 import { getAdminDict } from "@/lib/i18n/admin";
-import { DEMO_ADMIN } from "@/lib/site";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const {
@@ -123,11 +122,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </div>
       )}
       <main className="mx-auto max-w-3xl px-3 py-5">{children}</main>
-      {process.env.NODE_ENV !== "production" && (
-        <p className="pb-8 text-center text-xs text-text-muted/50">
-          demo: {DEMO_ADMIN.username} / {DEMO_ADMIN.password}
-        </p>
-      )}
     </div>
   );
 }

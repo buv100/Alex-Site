@@ -26,7 +26,7 @@
   מדריך מפורט: [`docs/MONGO_SETUP.md`](./MONGO_SETUP.md)
 - [ ] **Cloudinary** (חינם) להעלאת תמונות מהטלפון:  
   `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
-- [x] **אימייל + סיסמה לאדמין** (מוגדר ב־Vercel; לא ב־git)
+- [x] **אימייל + סיסמת כניסה פנימית** (מוגדר ב־Vercel; לא ב־git)
 - [x] אישור לפרוס ל־**Vercel Free** שמחובר ל־GitHub הקיים
 
 ---

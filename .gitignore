@@ -45,3 +45,8 @@ yarn-error.log*
 תמונה של אלכס.jpg
 
 public/images/alex-garibian-original.jpg
+
+# Local-only ops (credentials / entry URLs — never push)
+docs/PRIVATE_OPS.md
+docs/**/*.private.md
+
