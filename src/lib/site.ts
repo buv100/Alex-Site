@@ -3,6 +3,9 @@ export const siteConfig = {
   brandName: "אלכס נכסים",
   ownerFullName: "אלכס גריביאן",
   tagline: "הסוכנות המובילה בירושלים — יחס אישי ונסיון של מעל 20 שנה",
+  /** Portrait for hero / about — file in /public */
+  portraitSrc: "/images/alex-garibian.jpg",
+  portraitAlt: "אלכס גריביאן — מתווך נדל״ן בירושלים",
   aboutShort:
     "הסוכנות המובילה בירושלים: יחס אישי, נסיון מעל 20 שנה, היכרות מעמיקה עם כל שכונות ירושלים. דובר 4 שפות.",
   aboutLong: `אלכס גריביאן הוא מתווך נדל״ן הפועל בירושלים ומתמחה בדירות מגורים למכירה ולהשכרה.

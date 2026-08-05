@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
 import { licenseDisplay } from "@/lib/legal-display";
@@ -7,6 +8,16 @@ export const metadata = { title: "על אלכס" };
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
+      <div className="relative mb-8 aspect-[4/5] max-w-md overflow-hidden border border-border sm:aspect-[3/4]">
+        <Image
+          src={siteConfig.portraitSrc}
+          alt={siteConfig.portraitAlt}
+          fill
+          className="object-cover object-[center_15%]"
+          sizes="(max-width: 640px) 100vw, 448px"
+          priority
+        />
+      </div>
       <h1 className="font-display text-4xl text-accent">על אלכס</h1>
       <p className="mt-2 text-lg text-accent">{siteConfig.ownerFullName}</p>
       <p className="mt-6 whitespace-pre-line text-lg leading-relaxed text-text-muted">

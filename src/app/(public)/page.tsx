@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
 import {
@@ -11,22 +12,44 @@ export default function HomePage() {
 
   return (
     <>
-      <section className="hero-glow relative overflow-hidden border-b border-border">
-        <div className="mx-auto flex min-h-[88dvh] max-w-6xl flex-col justify-end px-4 pb-16 pt-24 sm:justify-center sm:pb-24">
+      <section className="relative min-h-[88dvh] overflow-hidden border-b border-border">
+        <Image
+          src={siteConfig.portraitSrc}
+          alt={siteConfig.portraitAlt}
+          fill
+          priority
+          className="object-cover object-[center_18%] sm:object-[center_22%]"
+          sizes="100vw"
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-bg via-bg/75 to-bg/25"
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-gradient-to-l from-bg/80 via-transparent to-transparent max-sm:hidden" aria-hidden />
+
+        <div className="relative z-10 mx-auto flex min-h-[88dvh] max-w-6xl flex-col justify-end px-4 pb-16 pt-28 sm:justify-center sm:pb-24">
           <p className="animate-fade-up text-sm uppercase tracking-[0.2em] text-accent">
             ירושלים · מכירה והשכרה
           </p>
           <h1 className="animate-fade-up font-display mt-4 max-w-3xl text-5xl leading-tight text-text sm:text-6xl md:text-7xl">
             {siteConfig.brandName}
           </h1>
-          <p className="animate-fade-up-delay mt-6 max-w-xl text-lg text-text-muted sm:text-xl">
+          <p className="animate-fade-up mt-2 text-lg text-accent sm:text-xl">
+            {siteConfig.ownerFullName}
+          </p>
+          <p className="animate-fade-up-delay mt-5 max-w-xl text-lg text-text-muted sm:text-xl">
             {siteConfig.aboutShort}
           </p>
           <div className="animate-fade-up-delay mt-10 flex flex-col gap-3 sm:flex-row">
             <Link href="/properties" className="btn btn-primary">
               לצפייה בנכסים
             </Link>
-            <a href={wa} className="btn btn-ghost" target="_blank" rel="noopener noreferrer">
+            <a
+              href={wa}
+              className="btn btn-ghost"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               וואטסאפ לאלכס
             </a>
           </div>
