@@ -20,13 +20,12 @@ function AdminLoginForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Clean the address bar WITHOUT a new navigation (router.replace would
-  // re-hit middleware without the unlock token and bounce to home).
+  // Clean ?access= from the address bar without a new navigation.
   useEffect(() => {
-    const dirty =
-      searchParams.get("access") ||
-      window.location.pathname.startsWith("/admin/g/");
-    if (dirty && window.location.pathname + window.location.search !== "/admin/login") {
+    if (
+      searchParams.get("access") &&
+      window.location.pathname === "/admin/login"
+    ) {
       window.history.replaceState(null, "", "/admin/login");
     }
   }, [searchParams]);
