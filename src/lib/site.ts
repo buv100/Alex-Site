@@ -24,7 +24,7 @@ export const siteConfig = {
   phoneTel: "+972528508407",
   whatsapp: "972528508407",
   email: "alexgaribian10@gmail.com",
-  licenseNumber: "026523",
+  licenseNumber: "26523",
   licenseHolderName: "אלכס גריביאן",
   dataControllerName: "אלכס גריביאן",
   privacyRequestsEmail: "alexgaribian10@gmail.com",

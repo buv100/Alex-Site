@@ -22,7 +22,7 @@ describe("broker disclosure", () => {
     const line = brokerMarketingLine();
     expect(line).toContain("אלכס גריביאן");
     expect(line).toContain("מתווך במקרקעין");
-    expect(line).toContain("026523");
+    expect(line).toContain("26523");
   });
 });
 
