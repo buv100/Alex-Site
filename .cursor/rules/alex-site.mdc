@@ -25,4 +25,4 @@ Before changing product behavior, read and follow:
 - Requirement changes → update `docs/SPEC.md` first, then code.
 
 ## Stack lock
-Next.js App Router + TypeScript + Tailwind + MongoDB Atlas free + Vercel free + Cloudinary/Blob free + Auth.js + wa.me (no WhatsApp Business API in v1).
+Next.js App Router + TypeScript + Tailwind + managed MongoDB free (`MONGODB_URI`: Atlas M0 / OVH Discovery / Clever Cloud) + Vercel free + Cloudinary/Blob free + Auth.js + wa.me (no WhatsApp Business API in v1).

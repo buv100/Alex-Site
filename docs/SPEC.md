@@ -385,7 +385,7 @@ draft → (preview) → published → sold | rented → archive
 |------|--------|--------|
 | Frontend/Backend | Next.js (App Router) + TypeScript | |
 | עיצוב | Tailwind CSS + CSS variables למותג | |
-| DB | MongoDB Atlas **M0 Free** | כפי שביקשת |
+| DB | MongoDB מנוהל **חינמי** | Atlas M0, או חלופה: OVHcloud Discovery / Clever Cloud Mongo free — אותו `MONGODB_URI` |
 | Hosting | Vercel Free | `*.vercel.app` בהתחלה |
 | תמונות | Cloudinary Free (מועדף) או Vercel Blob | אופטימיזציה למובייל |
 | Auth אדמין | Auth.js (credentials) + session מאובטחת | סיסמה חזקה, httpOnly cookie |
@@ -399,7 +399,7 @@ draft → (preview) → published → sold | rented → archive
 | סביבה | שימוש |
 |--------|--------|
 | Local | פיתוח |
-| Production | Vercel + Atlas — פרויקט אמיתי |
+| Production | Vercel + Mongo מנוהל חינמי (`MONGODB_URI`) — פרויקט אמיתי |
 
 Staging נפרד — לא חובה ב־MVP אם אין תקציב/זמן; אפשר preview deployments של Vercel.
 

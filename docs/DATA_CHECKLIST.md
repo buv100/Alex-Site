@@ -7,8 +7,23 @@
 
 ## 1. דחוף ל־Phase 2 (תשתית — אתה יוצר חשבונות)
 
-- [ ] **MongoDB Atlas** (חינם): אחרי יצירת Cluster → Connection String  
-  (`mongodb+srv://...`) — תעביר כ־`MONGODB_URI`
+- [ ] **MongoDB מנוהל חינמי** → `MONGODB_URI` (אל תדביק סיסמאות ב־git / README)
+
+  **עדיפות 1 — OVHcloud Discovery (חינם):**  
+  1. [MongoDB Discovery](https://www.ovhcloud.com/en/lp/mongodb-discovery/) / Public Cloud → Databases → MongoDB → תוכנית **Discovery** / `db2-free`  
+  2. רשת **Public**, משתמש + סיסמה  
+  3. העתק Connection String (`mongodb://` או `mongodb+srv://`) עם שם DB `alex-nekasim`  
+  4. הערה: לפי OVH, Discovery מתוכנן להסתיים ב־**31/08/2026** — אם לא זמין, עבור לחלופה.
+
+  **עדיפות 2 — Clever Cloud Mongo (חינם ~500MB):**  
+  1. [clever.cloud](https://www.clever.cloud/) → Add-on MongoDB (free plan)  
+  2. העתק `MONGODB_ADDON_URI` (לעתים הוסף `?directConnection=true`)
+
+  **עדיפות 3 — MongoDB Atlas M0** אם מוצאים Free בממשק.
+
+  אחרי שיש מחרוזת: הוסף ב־Vercel env בשם `MONGODB_URI` (Production) או שלח למפתח מחוץ לצ׳אט ציבורי.
+
+  מדריך מפורט: [`docs/MONGO_SETUP.md`](./MONGO_SETUP.md)
 - [ ] **Cloudinary** (חינם) להעלאת תמונות מהטלפון:  
   `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
 - [x] **אימייל + סיסמה לאדמין** (מוגדר ב־Vercel; לא ב־git)
