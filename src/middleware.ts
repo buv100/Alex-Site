@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
+import NextAuth from "next-auth";
+import { authConfig } from "@/auth.config";
 
-const DEV_SECRET = "dev-only-alex-nekasim-change-me-before-production";
+const { auth } = NextAuth(authConfig);
+
 const GATE_COOKIE = "alex_admin_gate";
 
 function isPublicSiteOnly() {
@@ -12,26 +13,24 @@ function isPublicSiteOnly() {
   return false;
 }
 
-function denyAdmin(req: NextRequest) {
-  const url = req.nextUrl.clone();
+function denyAdmin(req: { nextUrl: URL }) {
+  const url = new URL(req.nextUrl.href);
   url.pathname = "/";
   url.search = "";
   return NextResponse.redirect(url);
 }
 
-export async function middleware(req: NextRequest) {
+export default auth((req) => {
   const { pathname } = req.nextUrl;
 
   if (!pathname.startsWith("/admin")) {
     return NextResponse.next();
   }
 
-  // Production default: admin hidden unless ENABLE_ADMIN=true
   if (isPublicSiteOnly()) {
     return denyAdmin(req);
   }
 
-  // Secret entry gate — without cookie / correct ?access=… the admin "does not exist"
   const entrySecret = process.env.ADMIN_ENTRY_SECRET?.trim();
   if (entrySecret) {
     const access = req.nextUrl.searchParams.get("access");
@@ -59,24 +58,8 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  const serverAuthEnabled = Boolean(
-    process.env.AUTH_SECRET &&
-      process.env.AUTH_SECRET !== DEV_SECRET &&
-      (process.env.ADMIN_PASSWORD ||
-        process.env.ADMIN_PASSWORD_HASH ||
-        process.env.MONGODB_URI),
-  );
-
-  if (
-    serverAuthEnabled &&
-    pathname.startsWith("/admin") &&
-    !pathname.startsWith("/admin/login")
-  ) {
-    const token = await getToken({
-      req,
-      secret: process.env.AUTH_SECRET,
-    });
-    if (!token || token.role !== "admin") {
+  if (!pathname.startsWith("/admin/login")) {
+    if (req.auth?.user?.role !== "admin") {
       const url = req.nextUrl.clone();
       url.pathname = "/admin/login";
       url.search = "";
@@ -85,7 +68,7 @@ export async function middleware(req: NextRequest) {
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: ["/admin/:path*"],

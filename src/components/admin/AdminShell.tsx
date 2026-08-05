@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { signOut, useSession } from "next-auth/react";
 import { useDemo } from "@/components/providers/DemoProvider";
 import { getAdminDict } from "@/lib/i18n/admin";
 import { DEMO_ADMIN } from "@/lib/site";
@@ -10,17 +11,27 @@ import { DEMO_ADMIN } from "@/lib/site";
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const { adminLoggedIn, adminLocale, setAdminLocale, logoutAdmin, ready } =
     useDemo();
+  const { data: session, status } = useSession();
   const t = getAdminDict(adminLocale);
   const pathname = usePathname();
   const router = useRouter();
   const isLogin = pathname === "/admin/login";
+  const isAdminSession = session?.user?.role === "admin";
+  const allowed = adminLoggedIn || isAdminSession;
 
   useEffect(() => {
     if (!ready || isLogin) return;
-    if (!adminLoggedIn) router.replace("/admin/login");
-  }, [ready, adminLoggedIn, isLogin, router]);
+    if (status === "loading") return;
+    if (!allowed) router.replace("/admin/login");
+  }, [ready, allowed, isLogin, router, status]);
 
-  if (!ready) {
+  async function onLogout() {
+    logoutAdmin();
+    await signOut({ redirect: false });
+    router.replace("/admin/login");
+  }
+
+  if (!ready || (!isLogin && status === "loading" && !adminLoggedIn)) {
     return <p className="p-6 text-text-muted">…</p>;
   }
 
@@ -28,7 +39,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  if (!adminLoggedIn) {
+  if (!allowed) {
     return <p className="p-6 text-text-muted">…</p>;
   }
 
@@ -57,12 +68,19 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <option value="he">עברית</option>
               <option value="ru">Русский</option>
             </select>
-            <button type="button" className="btn btn-ghost min-h-11 px-3 text-sm" onClick={logoutAdmin}>
+            <button
+              type="button"
+              className="btn btn-ghost min-h-11 px-3 text-sm"
+              onClick={onLogout}
+            >
               {t.logout}
             </button>
           </div>
         </div>
-        <nav className="mx-auto flex max-w-3xl gap-1 overflow-x-auto px-2 pb-2" aria-label="Admin">
+        <nav
+          className="mx-auto flex max-w-3xl gap-1 overflow-x-auto px-2 pb-2"
+          aria-label="Admin"
+        >
           {nav.map((item) => {
             const active =
               item.href === "/admin"
@@ -80,7 +98,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
-          <Link href="/" className="min-h-11 shrink-0 px-3 py-2 text-sm text-text-muted">
+          <Link
+            href="/"
+            className="min-h-11 shrink-0 px-3 py-2 text-sm text-text-muted"
+          >
             {t.viewSite}
           </Link>
         </nav>
