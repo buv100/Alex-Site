@@ -8,13 +8,13 @@ export const metadata = { title: "על אלכס" };
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
-      <div className="relative mb-8 aspect-[4/5] max-w-md overflow-hidden border border-border sm:aspect-[3/4]">
+      <div className="relative mb-8 aspect-[4/5] max-w-sm overflow-hidden bg-bg-soft sm:aspect-[3/4]">
         <Image
           src={siteConfig.portraitSrc}
           alt={siteConfig.portraitAlt}
           fill
-          className="object-cover object-[center_15%]"
-          sizes="(max-width: 640px) 100vw, 448px"
+          className="object-cover object-top"
+          sizes="(max-width: 640px) 100vw, 384px"
           priority
         />
       </div>

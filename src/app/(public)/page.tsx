@@ -18,7 +18,7 @@ export default function HomePage() {
           alt={siteConfig.portraitAlt}
           fill
           priority
-          className="object-cover object-[center_18%] sm:object-[center_22%]"
+          className="object-cover object-[center_20%] scale-105"
           sizes="100vw"
         />
         <div
