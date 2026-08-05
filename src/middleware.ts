@@ -28,8 +28,6 @@ function setGateCookie(res: NextResponse) {
 function adminEnabled() {
   if (process.env.PUBLIC_SITE_ONLY === "true") return false;
   if (process.env.ENABLE_ADMIN === "true") return true;
-  // If an entry secret exists, allow unlock via that secret even when
-  // ENABLE_ADMIN was mis-set — otherwise only local/dev works.
   if (process.env.ADMIN_ENTRY_SECRET?.trim()) return true;
   if (process.env.VERCEL_ENV === "production") return false;
   return true;
@@ -46,21 +44,31 @@ export default auth((req) => {
     return denyAdmin(req);
   }
 
+  const isAdminSession = req.auth?.user?.role === "admin";
+
+  // Logged-in owner always passes — do not require the entry-gate cookie
+  // (that cookie is often missing after client-side signIn + soft navigation).
+  if (isAdminSession) {
+    const res = NextResponse.next();
+    setGateCookie(res);
+    return res;
+  }
+
   const entrySecret = process.env.ADMIN_ENTRY_SECRET?.trim();
   if (entrySecret) {
     const access = req.nextUrl.searchParams.get("access");
     const hasGate = req.cookies.get(GATE_COOKIE)?.value === "1";
 
-    // Path unlock: /admin/g/<secret> — survives WhatsApp better than ?access=
     const pathUnlock = pathname.match(/^\/admin\/g\/([^/]+)\/?$/);
-    const pathToken = pathUnlock?.[1] ? decodeURIComponent(pathUnlock[1]) : null;
+    const pathToken = pathUnlock?.[1]
+      ? decodeURIComponent(pathUnlock[1])
+      : null;
 
     const tokenOk =
       (access && access === entrySecret) ||
       (pathToken && pathToken === entrySecret);
 
     if (tokenOk) {
-      // Serve login on this 200 response + set cookie (no 302 — mobile-safe)
       if (pathname !== "/admin/login") {
         const url = req.nextUrl.clone();
         url.pathname = "/admin/login";
@@ -79,13 +87,12 @@ export default auth((req) => {
     }
   }
 
+  // Not logged in: only the login screen is reachable (behind the gate above).
   if (!pathname.startsWith("/admin/login")) {
-    if (req.auth?.user?.role !== "admin") {
-      const url = req.nextUrl.clone();
-      url.pathname = "/admin/login";
-      url.search = "";
-      return NextResponse.redirect(url);
-    }
+    const url = req.nextUrl.clone();
+    url.pathname = "/admin/login";
+    url.search = "";
+    return NextResponse.redirect(url);
   }
 
   return NextResponse.next();

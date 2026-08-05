@@ -55,14 +55,20 @@ function AdminLoginForm() {
 
       if (result?.ok) {
         markAdminLoggedIn();
-        setLoading(false);
-        router.push("/admin");
+        // Full page load so the session cookie is always sent to middleware.
+        window.location.assign("/admin");
         return;
       }
 
-      setError("שם משתמש או סיסמה שגויים");
+      const msg =
+        result?.error === "CredentialsSignin"
+          ? "שם משתמש או סיסמה שגויים"
+          : result?.error
+            ? `שגיאת התחברות (${result.error})`
+            : "שם משתמש או סיסמה שגויים";
+      setError(msg);
     } catch {
-      setError("שם משתמש או סיסמה שגויים");
+      setError("שגיאת רשת — נסו שוב");
     }
 
     setLoading(false);
