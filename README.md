@@ -21,7 +21,9 @@ npm run dev
 
 http://localhost:3000
 
-אדמין של אלכס זמין **רק מקומית** (או עם `ENABLE_ADMIN=true`), לא בקישור הציבורי.
+אדמין של אלכס: [https://alex-nekasim.vercel.app/admin/login](https://alex-nekasim.vercel.app/admin/login)  
+(אין קישור בפוטר הציבורי — רק מי שיודע את הכתובת נכנס; דורש התחברות.  
+מקומית: `http://localhost:3000/admin/login` אחרי `npm run dev`.)
 
 ### מצבי עבודה
 

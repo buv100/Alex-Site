@@ -86,9 +86,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </nav>
       </header>
       <main className="mx-auto max-w-3xl px-3 py-5">{children}</main>
-      <p className="pb-8 text-center text-xs text-text-muted/50">
-        demo: {DEMO_ADMIN.username} / {DEMO_ADMIN.password}
-      </p>
+      {process.env.NODE_ENV !== "production" && (
+        <p className="pb-8 text-center text-xs text-text-muted/50">
+          demo: {DEMO_ADMIN.username} / {DEMO_ADMIN.password}
+        </p>
+      )}
     </div>
   );
 }
