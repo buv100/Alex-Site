@@ -20,6 +20,18 @@ function denyAdmin(req: { nextUrl: URL }) {
   return NextResponse.redirect(url);
 }
 
+function setGateCookie(res: NextResponse) {
+  const onHttps =
+    process.env.VERCEL === "1" || process.env.NODE_ENV === "production";
+  res.cookies.set(GATE_COOKIE, "1", {
+    httpOnly: true,
+    secure: onHttps,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30,
+  });
+}
+
 export default auth((req) => {
   const { pathname } = req.nextUrl;
 
@@ -36,20 +48,11 @@ export default auth((req) => {
     const access = req.nextUrl.searchParams.get("access");
     const hasGate = req.cookies.get(GATE_COOKIE)?.value === "1";
 
+    // Valid token: serve the page on THIS response (200) and set the cookie.
+    // Mobile / in-app browsers often drop Set-Cookie on 302 redirects.
     if (access && access === entrySecret) {
-      const url = req.nextUrl.clone();
-      url.searchParams.delete("access");
-      if (!url.pathname.startsWith("/admin/login")) {
-        url.pathname = "/admin/login";
-      }
-      const res = NextResponse.redirect(url);
-      res.cookies.set(GATE_COOKIE, "1", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 30,
-      });
+      const res = NextResponse.next();
+      setGateCookie(res);
       return res;
     }
 
