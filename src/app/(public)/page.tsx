@@ -12,20 +12,24 @@ export default function HomePage() {
 
   return (
     <>
-      <section className="relative min-h-[88dvh] overflow-hidden border-b border-border">
-        <Image
-          src={siteConfig.portraitSrc}
-          alt={siteConfig.portraitAlt}
-          fill
-          priority
-          className="object-cover object-[center_20%] scale-105"
-          sizes="100vw"
-        />
+      <section className="relative min-h-[88dvh] overflow-hidden border-b border-border bg-bg">
+        <div className="absolute inset-0 flex items-stretch justify-center sm:justify-end">
+          <div className="relative h-full w-full max-w-xl sm:max-w-2xl md:max-w-3xl">
+            <Image
+              src={siteConfig.portraitSrc}
+              alt={siteConfig.portraitAlt}
+              fill
+              priority
+              className="object-contain object-bottom sm:object-[center_right]"
+              sizes="(max-width: 640px) 100vw, 60vw"
+            />
+          </div>
+        </div>
         <div
-          className="absolute inset-0 bg-gradient-to-t from-bg via-bg/75 to-bg/25"
+          className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-bg/20"
           aria-hidden
         />
-        <div className="absolute inset-0 bg-gradient-to-l from-bg/80 via-transparent to-transparent max-sm:hidden" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-l from-bg via-bg/40 to-transparent max-sm:hidden" aria-hidden />
 
         <div className="relative z-10 mx-auto flex min-h-[88dvh] max-w-6xl flex-col justify-end px-4 pb-16 pt-28 sm:justify-center sm:pb-24">
           <p className="animate-fade-up text-sm uppercase tracking-[0.2em] text-accent">
