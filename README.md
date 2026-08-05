@@ -2,16 +2,18 @@
 
 תיווך דירות בירושלים — אתר למשתמשים / לקוחות.
 
-## פתיחת האתר (צד משתמש)
+## האתר החי
 
 **https://alex-nekasim.vercel.app**
 
-הקישור מתעדכן אחרי כל פרסום.  
-גלישת נכסים, יצירת קשר ומועדפים בלבד.
+פרטי קשר, רישיון תיווך, תמונה וטקסטים של אלכס גריביאן באוויר.  
+בוט AI — יתווסף בהמשך (לא בגרסה הנוכחית).
+
+ניהול פנימי מוגדר בנפרד (קישור סודי + סיסמה) — **אין לפרסם** ב־GitHub / README.
 
 ---
 
-## הרצה מקומית (פיתוח)
+## הרצה מקומית
 
 ```bash
 npm install
@@ -19,23 +21,21 @@ cp .env.example .env.local
 npm run dev
 ```
 
-http://localhost:3000
-
-ניהול פנימי מוגדר מקומית דרך משתני סביבה — **אין לפרסם קישורי ניהול או סיסמאות ב־GitHub / README**.
+```bash
+npm test
+npm run build
+```
 
 ### מצבי עבודה
 
 | מצב | מתי | התנהגות |
 |-----|-----|---------|
-| **דמו** | אין `MONGODB_URI` | נתונים ב־localStorage |
-| **שרת** | יש `MONGODB_URI` | MongoDB + Auth + העלאת תמונות |
-
-## Phase 2 — env
-
-ראו [`.env.example`](.env.example) ו־[`docs/DATA_CHECKLIST.md`](docs/DATA_CHECKLIST.md).
+| **דמו** | אין `MONGODB_URI` | נתונים ב־localStorage של הדפדפן |
+| **שרת** | יש `MONGODB_URI` (+ Cloudinary להעלאות) | נתונים משותפים בשרת |
 
 ## מסמכים
 
 - [`docs/SPEC.md`](docs/SPEC.md)
+- [`docs/COMPLIANCE.md`](docs/COMPLIANCE.md)
 - [`docs/PROJECT_RULES.md`](docs/PROJECT_RULES.md)
 - [`docs/DATA_CHECKLIST.md`](docs/DATA_CHECKLIST.md)

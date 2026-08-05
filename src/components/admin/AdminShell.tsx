@@ -9,8 +9,14 @@ import { getAdminDict } from "@/lib/i18n/admin";
 import { DEMO_ADMIN } from "@/lib/site";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
-  const { adminLoggedIn, adminLocale, setAdminLocale, logoutAdmin, ready } =
-    useDemo();
+  const {
+    adminLoggedIn,
+    adminLocale,
+    setAdminLocale,
+    logoutAdmin,
+    ready,
+    serverMode,
+  } = useDemo();
   const { data: session, status } = useSession();
   const t = getAdminDict(adminLocale);
   const pathname = usePathname();
@@ -106,6 +112,16 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </Link>
         </nav>
       </header>
+      {!serverMode && (
+        <div
+          className="border-b border-accent/40 bg-accent-dim px-3 py-3 text-sm text-text"
+          role="status"
+        >
+          {adminLocale === "ru"
+            ? "Режим демо: объекты сохраняются в браузере этого телефона. Для общего сервера нужны MongoDB + Cloudinary."
+            : "מצב דמו: נכסים ופניות נשמרים בדפדפן של הטלפון הזה בלבד. לשמירה משותפת בשרת — חיבור MongoDB + Cloudinary."}
+        </div>
+      )}
       <main className="mx-auto max-w-3xl px-3 py-5">{children}</main>
       {process.env.NODE_ENV !== "production" && (
         <p className="pb-8 text-center text-xs text-text-muted/50">

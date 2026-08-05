@@ -9,6 +9,7 @@ import {
   propertyTypeLabel,
   publicAddress,
 } from "@/lib/format";
+import { BrokerDisclosure } from "@/components/legal/BrokerDisclosure";
 
 export function PropertyCard({ property }: { property: PublicProperty }) {
   const cover = property.images[0];
@@ -30,7 +31,6 @@ export function PropertyCard({ property }: { property: PublicProperty }) {
               אין תמונה
             </div>
           )}
-          {/* Scrim so labels stay readable on any photo */}
           <div
             className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/55 to-transparent"
             aria-hidden
@@ -62,6 +62,7 @@ export function PropertyCard({ property }: { property: PublicProperty }) {
             {property.rooms} חדרים · {propertyTypeLabel(property.propertyType)}
             {property.sizeSqm ? ` · ${property.sizeSqm} מ״ר` : ""}
           </p>
+          <BrokerDisclosure />
         </div>
       </Link>
     </article>

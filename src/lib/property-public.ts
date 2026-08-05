@@ -1,17 +1,9 @@
 import type { Property, PublicProperty } from "./types";
-
-const PRIVATE_KEYS = [
-  "ownerName",
-  "ownerPhone",
-  "ownerNotes",
-  "minPriceNegotiable",
-  "internalNotes",
-  "exactAddress",
-] as const;
+import { PRIVATE_PROPERTY_FIELDS } from "./legal-display";
 
 export function toPublicProperty(p: Property): PublicProperty {
   const copy = { ...p };
-  for (const key of PRIVATE_KEYS) {
+  for (const key of PRIVATE_PROPERTY_FIELDS) {
     delete (copy as Record<string, unknown>)[key];
   }
   return copy as PublicProperty;

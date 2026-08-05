@@ -1,4 +1,5 @@
 import { LeadForm } from "@/components/forms/LeadForm";
+import { BrokerDisclosure } from "@/components/legal/BrokerDisclosure";
 import { siteConfig } from "@/lib/site";
 import {
   buildWhatsAppUrl,
@@ -30,6 +31,7 @@ export default function ContactPage() {
           וואטסאפ
         </a>
       </div>
+      <BrokerDisclosure className="mt-4" />
 
       <div className="mt-10 rounded border border-border bg-bg-elevated p-5">
         <LeadForm type="general" />

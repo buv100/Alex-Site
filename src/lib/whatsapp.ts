@@ -1,4 +1,5 @@
 import { siteConfig } from "./site";
+import { brokerMarketingLine } from "./legal-display";
 
 export function buildWhatsAppUrl(text: string): string {
   const encoded = encodeURIComponent(text);
@@ -10,17 +11,19 @@ export function propertyInquiryMessage(opts: {
   neighborhood: string;
   url: string;
 }): string {
-  return `שלום אלכס, אני מעוניין/ת בנכס: ${opts.title}
+  return `שלום ${siteConfig.ownerFullName}, אני מעוניין/ת בנכס: ${opts.title}
 שכונה: ${opts.neighborhood}
-קישור: ${opts.url}`;
+קישור: ${opts.url}
+(${brokerMarketingLine()})`;
 }
 
 export function sharePropertyMessage(opts: {
   title: string;
   url: string;
 }): string {
-  return `דירה מאלכס נכסים: ${opts.title}
-${opts.url}`;
+  return `${opts.title}
+${opts.url}
+${brokerMarketingLine()}`;
 }
 
 export function leadReplyMessage(opts: {
@@ -30,9 +33,9 @@ export function leadReplyMessage(opts: {
   const about = opts.propertyTitle
     ? ` לגבי הנכס «${opts.propertyTitle}»`
     : "";
-  return `שלום ${opts.name},${about} כאן אלכס מאלכס נכסים.`;
+  return `שלום ${opts.name},${about} כאן ${siteConfig.ownerFullName}, מתווך במקרקעין.`;
 }
 
 export function generalWhatsAppMessage(): string {
-  return "שלום אלכס, אשמח ליצור קשר לגבי נדל״ן בירושלים.";
+  return `שלום ${siteConfig.ownerFullName}, אשמח ליצור קשר לגבי נדל״ן בירושלים.`;
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
 import { licenseDisplay } from "@/lib/legal-display";
+import { BrokerDisclosure } from "@/components/legal/BrokerDisclosure";
 
 export function SiteFooter() {
   return (
@@ -10,7 +11,8 @@ export function SiteFooter() {
           <p className="font-display text-2xl text-accent">{siteConfig.brandName}</p>
           <p className="mt-1 text-sm text-text">{siteConfig.ownerFullName}</p>
           <p className="mt-2 max-w-sm text-sm text-text-muted">{siteConfig.tagline}</p>
-          <p className="mt-4 text-sm text-text-muted">{licenseDisplay()}</p>
+          <BrokerDisclosure className="mt-4" />
+          <p className="mt-2 text-sm text-text-muted">{licenseDisplay()}</p>
           <p className="mt-3 max-w-md text-xs leading-relaxed text-text-muted">
             מחירים וזמינות כפופים לשינוי. המידע באתר אינו הצעה מחייבת. ראו{" "}
             <Link href="/disclaimer" className="text-accent underline">

@@ -17,6 +17,7 @@ import {
   propertyInquiryMessage,
   sharePropertyMessage,
 } from "@/lib/whatsapp";
+import { BrokerDisclosure } from "@/components/legal/BrokerDisclosure";
 
 export default function PropertyDetailClient() {
   const params = useParams<{ id: string }>();
@@ -115,6 +116,7 @@ export default function PropertyDetailClient() {
           </div>
           <h1 className="font-display text-4xl leading-tight">{property.title}</h1>
           <p className="text-text-muted">{publicAddress(property)}</p>
+          <BrokerDisclosure />
           <p className="text-2xl font-semibold text-accent">
             {formatPrice(property.price)}
             {property.dealType === "rent" && property.price !== null && (
