@@ -1,33 +1,36 @@
-/** Placeholder site config — replace via DATA_CHECKLIST */
+/** Site config — business details from Alex (DATA_CHECKLIST) */
 export const siteConfig = {
   brandName: "אלכס נכסים",
-  tagline: "תיווך אישי לדירות בירושלים",
+  ownerFullName: "אלכס גריביאן",
+  tagline: "הסוכנות המובילה בירושלים — יחס אישי ונסיון של מעל 20 שנה",
   aboutShort:
-    "אלכס מלווה קונים, שוכרים ומוכרים בירושלים ביחס אישי, שקיפות מלאה וליווי צמוד — מהפגישה הראשונה ועד המפתח.",
-  aboutLong: `אלכס הוא מתווך נדל״ן הפועל בירושלים ומתמחה בדירות מגורים למכירה ולהשכרה.
-האתר נועד לנוחות הלקוחות והמכרים — כל הפרטים, התמונות והפניות במקום אחד, במקום שיחות אינסופיות ושליחת קבצים הלוך ושוב.
-העבודה היא אישית: כל נכס מטופל ישירות על ידי אלכס, עם דגש על התאמה נכונה ולא על כמות.`,
+    "הסוכנות המובילה בירושלים: יחס אישי, נסיון מעל 20 שנה, היכרות מעמיקה עם כל שכונות ירושלים. דובר 4 שפות.",
+  aboutLong: `אלכס גריביאן הוא מתווך נדל״ן הפועל בירושלים ומתמחה בדירות מגורים למכירה ולהשכרה.
+
+הסוכנות המובילה בירושלים — יחס אישי, נסיון של מעל 20 שנה, והיכרות מעמיקה עם כל שכונות העיר. אלכס דובר 4 שפות ומלווה קונים, שוכרים ומוכרים מהפגישה הראשונה ועד המפתח.
+
+העבודה אישית: כל נכס מטופל ישירות על ידי אלכס, עם דגש על התאמה נכונה ולא על כמות.`,
   whyWorkWithAlex: [
-    "ליווי אישי מקצה לקצה — לא מוקד ולא תורים",
-    "היכרות עמוקה עם שכונות ירושלים",
-    "שקיפות במחיר ובמצב הנכס",
-    "זמינות בוואטסאפ ובטלפון",
+    "הסוכנות המובילה בירושלים",
+    "יחס אישי — לא מוקד ולא תורים",
+    "נסיון של מעל 20 שנה",
+    "היכרות מעמיקה עם כל שכונות ירושלים",
+    "דובר 4 שפות",
   ],
-  phone: "050-000-0000",
-  phoneTel: "+972500000000",
-  whatsapp: "972500000000",
-  email: "leads@alex-nekasim.demo",
-  /** Placeholders until DATA_CHECKLIST is filled */
-  licenseNumber: null as string | null,
-  licenseHolderName: null as string | null,
-  dataControllerName: "אלכס (פרטים מלאים יושלמו)",
-  privacyRequestsEmail: "leads@alex-nekasim.demo",
+  phone: "052-850-8407",
+  phoneTel: "+972528508407",
+  whatsapp: "972528508407",
+  email: "alexgaribian10@gmail.com",
+  licenseNumber: "026523",
+  licenseHolderName: "אלכס גריביאן",
+  dataControllerName: "אלכס גריביאן",
+  privacyRequestsEmail: "alexgaribian10@gmail.com",
   legalDraftUpdatedAt: "2026-08-05",
   city: "ירושלים",
   accessibilityCoordinator: {
-    name: null as string | null,
-    phone: null as string | null,
-    email: "accessibility@alex-nekasim.demo",
+    name: "אלכס גריביאן",
+    phone: "052-850-8407",
+    email: "alexgaribian10@gmail.com",
   },
   neighborhoods: [
     "רחביה",
@@ -47,6 +50,6 @@ export const siteConfig = {
 
 export const DEMO_ADMIN = {
   username: "alex",
-  /** Demo only — Phase 2 will use hashed secrets in env */
+  /** Local demo only — production uses ADMIN_PASSWORD in Vercel env */
   password: "alex-demo-2026",
 } as const;

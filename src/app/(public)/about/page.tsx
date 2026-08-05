@@ -8,6 +8,7 @@ export default function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
       <h1 className="font-display text-4xl text-accent">על אלכס</h1>
+      <p className="mt-2 text-lg text-accent">{siteConfig.ownerFullName}</p>
       <p className="mt-6 whitespace-pre-line text-lg leading-relaxed text-text-muted">
         {siteConfig.aboutLong}
       </p>
