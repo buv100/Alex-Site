@@ -94,7 +94,7 @@ export function PropertyForm({ initial }: { initial: Property }) {
   }
 
   return (
-    <div className="space-y-6 pb-24">
+    <div className="space-y-6 pb-28 sm:pb-24">
       <section className="space-y-4">
         <h2 className="font-display text-xl text-accent">{t.publicSection}</h2>
 
@@ -324,12 +324,11 @@ export function PropertyForm({ initial }: { initial: Property }) {
         <h2 className="font-display text-xl text-accent">{t.images}</h2>
         <p className="text-xs text-text-muted">{t.uploadHint}</p>
         <div className="field">
-          <label htmlFor="img-file">העלאה מהגלריה (Cloudinary)</label>
+          <label htmlFor="img-file">העלאה מגלריית התמונות</label>
           <input
             id="img-file"
             type="file"
-            accept="image/*"
-            capture="environment"
+            accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic"
             onChange={async (e) => {
               const file = e.target.files?.[0];
               if (!file) return;
@@ -475,17 +474,25 @@ export function PropertyForm({ initial }: { initial: Property }) {
         </p>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-bg-elevated/95 p-3 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl flex-wrap gap-2">
-          <button type="button" className="btn btn-primary flex-1" onClick={onSave}>
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-bg-elevated/95 px-3 pt-2 backdrop-blur pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+        <div className="mx-auto flex max-w-3xl gap-2">
+          <button
+            type="button"
+            className="btn btn-primary min-h-11 flex-1 py-2 text-sm"
+            onClick={onSave}
+          >
             {t.save}
           </button>
-          <button type="button" className="btn btn-ghost flex-1" onClick={onPublish}>
+          <button
+            type="button"
+            className="btn btn-ghost min-h-11 flex-1 py-2 text-sm"
+            onClick={onPublish}
+          >
             {t.publish}
           </button>
           <button
             type="button"
-            className="btn btn-ghost flex-1"
+            className="btn btn-ghost min-h-11 shrink-0 px-3 py-2 text-sm"
             onClick={() => {
               saveProperty(form);
               router.push(`/admin/properties/${form.id}/preview`);
@@ -493,55 +500,62 @@ export function PropertyForm({ initial }: { initial: Property }) {
           >
             {t.preview}
           </button>
-          <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={() => {
-              saveProperty(form);
-              setPropertyStatus(form.id, "sold");
-              setForm((f) => ({ ...f, status: "sold" }));
-            }}
-          >
-            {t.markSold}
-          </button>
-          <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={() => {
-              saveProperty(form);
-              setPropertyStatus(form.id, "rented");
-              setForm((f) => ({ ...f, status: "rented" }));
-            }}
-          >
-            {t.markRented}
-          </button>
-          {form.deletedAt ? (
-            <button
-              type="button"
-              className="btn btn-ghost"
-              onClick={() => {
-                restoreProperty(form.id);
-                setForm((f) => ({ ...f, deletedAt: null }));
-              }}
-            >
-              {t.restore}
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="btn btn-danger"
-              onClick={() => {
-                softDeleteProperty(form.id);
-                setForm((f) => ({
-                  ...f,
-                  deletedAt: new Date().toISOString(),
-                }));
-              }}
-            >
-              {t.delete}
-            </button>
-          )}
         </div>
+        <details className="mx-auto mt-1 max-w-3xl">
+          <summary className="cursor-pointer list-none py-1.5 text-center text-xs text-text-muted [&::-webkit-details-marker]:hidden">
+            {adminLocale === "ru" ? "Ещё действия ▾" : "עוד פעולות ▾"}
+          </summary>
+          <div className="flex flex-wrap justify-center gap-2 pb-1">
+            <button
+              type="button"
+              className="btn btn-ghost min-h-10 px-3 py-1.5 text-xs"
+              onClick={() => {
+                saveProperty(form);
+                setPropertyStatus(form.id, "sold");
+                setForm((f) => ({ ...f, status: "sold" }));
+              }}
+            >
+              {t.markSold}
+            </button>
+            <button
+              type="button"
+              className="btn btn-ghost min-h-10 px-3 py-1.5 text-xs"
+              onClick={() => {
+                saveProperty(form);
+                setPropertyStatus(form.id, "rented");
+                setForm((f) => ({ ...f, status: "rented" }));
+              }}
+            >
+              {t.markRented}
+            </button>
+            {form.deletedAt ? (
+              <button
+                type="button"
+                className="btn btn-ghost min-h-10 px-3 py-1.5 text-xs"
+                onClick={() => {
+                  restoreProperty(form.id);
+                  setForm((f) => ({ ...f, deletedAt: null }));
+                }}
+              >
+                {t.restore}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="btn btn-danger min-h-10 px-3 py-1.5 text-xs"
+                onClick={() => {
+                  softDeleteProperty(form.id);
+                  setForm((f) => ({
+                    ...f,
+                    deletedAt: new Date().toISOString(),
+                  }));
+                }}
+              >
+                {t.delete}
+              </button>
+            )}
+          </div>
+        </details>
       </div>
     </div>
   );
