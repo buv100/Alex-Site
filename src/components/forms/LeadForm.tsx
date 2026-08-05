@@ -5,6 +5,10 @@ import { useState } from "react";
 import { FormPrivacyNotice } from "@/components/forms/FormPrivacyNotice";
 import { useDemo } from "@/components/providers/DemoProvider";
 import type { LeadType } from "@/lib/types";
+import {
+  buildWhatsAppUrl,
+  formLeadWhatsAppMessage,
+} from "@/lib/whatsapp";
 
 interface Props {
   type: LeadType;
@@ -28,6 +32,7 @@ export function LeadForm({
   const [consent, setConsent] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
+  const [waUrl, setWaUrl] = useState<string | null>(null);
 
   const errorId = `lead-error-${type}`;
   const noticeId = `lead-privacy-notice-${type}`;
@@ -43,7 +48,7 @@ export function LeadForm({
       setError("יש לאשר את מדיניות הפרטיות");
       return;
     }
-    addLead({
+    const payload = {
       type,
       name: name.trim(),
       phone: phone.trim(),
@@ -52,7 +57,23 @@ export function LeadForm({
       propertyTitle,
       propertyUrl,
       privacyConsentAt: new Date().toISOString(),
-    });
+    };
+    void addLead(payload);
+
+    const url = buildWhatsAppUrl(
+      formLeadWhatsAppMessage({
+        type,
+        name: payload.name,
+        phone: payload.phone,
+        message: payload.message,
+        propertyTitle,
+        propertyUrl,
+      }),
+    );
+    setWaUrl(url);
+    // Open WhatsApp so Alex actually receives the inquiry (no email/SMS in v1)
+    window.open(url, "_blank", "noopener,noreferrer");
+
     setDone(true);
     setName("");
     setPhone("");
@@ -66,11 +87,24 @@ export function LeadForm({
         className="rounded border border-success/40 bg-success/10 p-4 text-sm"
         role="status"
       >
-        הפנייה נשלחה. אלכס יחזור אליכם בהקדם.
+        <p>תודה. נפתח וואטסאפ עם הפרטים לאלכס — לחצו «שלח» שם כדי שהוא יקבל.</p>
+        {waUrl && (
+          <a
+            href={waUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-primary mt-4 inline-flex"
+          >
+            פתיחת וואטסאפ שוב
+          </a>
+        )}
         <button
           type="button"
           className="mt-3 block text-accent underline"
-          onClick={() => setDone(false)}
+          onClick={() => {
+            setDone(false);
+            setWaUrl(null);
+          }}
         >
           שליחה נוספת
         </button>

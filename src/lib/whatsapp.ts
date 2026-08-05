@@ -39,3 +39,36 @@ export function leadReplyMessage(opts: {
 export function generalWhatsAppMessage(): string {
   return `שלום ${siteConfig.ownerFullName}, אשמח ליצור קשר לגבי נדל״ן בירושלים.`;
 }
+
+/** Prefill for Alex when a visitor submits the on-site lead form */
+export function formLeadWhatsAppMessage(opts: {
+  type: string;
+  name: string;
+  phone: string;
+  message?: string | null;
+  propertyTitle?: string | null;
+  propertyUrl?: string | null;
+}): string {
+  const typeLabel =
+    opts.type === "seller"
+      ? "יש לי נכס"
+      : opts.type === "property"
+        ? "פנייה לנכס"
+        : "פנייה כללית";
+  const lines = [
+    `פנייה חדשה מהאתר (${typeLabel})`,
+    `שם: ${opts.name}`,
+    `טלפון: ${opts.phone}`,
+  ];
+  if (opts.propertyTitle) {
+    lines.push(`נכס: ${opts.propertyTitle}`);
+  }
+  if (opts.propertyUrl) {
+    lines.push(`קישור: ${opts.propertyUrl}`);
+  }
+  if (opts.message?.trim()) {
+    lines.push(`הודעה: ${opts.message.trim()}`);
+  }
+  lines.push(`(${brokerMarketingLine()})`);
+  return lines.join("\n");
+}
