@@ -10,21 +10,21 @@ Before changing product behavior, read and follow:
 - `docs/PROJECT_RULES.md` (workflow, accessibility, privacy, design)
 - `docs/DATA_CHECKLIST.md` (client-provided assets; do not invent final business contact details)
 
+Private credentials / entry URLs: gitignored `docs/PRIVATE_OPS.md` only — never commit or copy into tracked docs.
+
 ## Non-negotiables
-- Public site: Hebrew only, RTL. Admin: Hebrew + Russian.
+- Public site: Hebrew only, RTL.
 - Budget: free tiers only unless the user explicitly approves paid services.
-- Only Alex (admin) can publish properties. No public property submission to live listings.
+- Only the business owner can publish properties. No public property submission to live listings.
 - Public address: city + neighborhood + optional street name — never building/apartment number.
 - Missing price → display "צור קשר לבירור".
 - No free-text search, no map, no blog/CMS in v1.
-- Admin UI is mobile-first (Alex works from phone browser only).
 - Never expose private property fields (`owner*`, `internalNotes`, `exactAddress`, `minPriceNegotiable`) via public API or HTML.
 - Accessibility: build to IS 5568 / WCAG 2.0 AA in code (not overlay-only).
 - Privacy: Amendment 13 — privacy policy link + unchecked consent checkbox on forms collecting PII.
-- Static marketing copy lives in code; not editable in admin in v1.
+- Static marketing copy lives in code in v1.
 - Requirement changes → update `docs/SPEC.md` first, then code.
+- Do not document private tooling, entry URLs, or credentials in any committed file.
 
 ## Stack lock
 Next.js App Router + TypeScript + Tailwind + managed MongoDB free (`MONGODB_URI`: Atlas M0 / OVH Discovery / Clever Cloud) + Vercel free + Cloudinary/Blob free + Auth.js + wa.me (no WhatsApp Business API in v1).
-
-Do not publish internal-tool entry URLs, passwords, or gate tokens in README, public docs, footer, or chat that may be committed.

@@ -26,7 +26,7 @@
   מדריך מפורט: [`docs/MONGO_SETUP.md`](./MONGO_SETUP.md)
 - [ ] **Cloudinary** (חינם) להעלאת תמונות מהטלפון:  
   `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
-- [x] **אימייל + סיסמת כניסה פנימית** (מוגדר ב־Vercel; לא ב־git)
+- [x] **אימייל + סיסמאות שרת** (מוגדר ב־Vercel; לא ב־git)
 - [x] אישור לפרוס ל־**Vercel Free** שמחובר ל־GitHub הקיים
 
 ---
@@ -94,7 +94,7 @@
 
 ## 7. סדר מומלץ למשלוח
 
-1. ~~Mongo URI + Cloudinary + סיסמת אדמין (env)~~ → חסר Mongo + Cloudinary  
+1. ~~Mongo URI + Cloudinary + סיסמאות שרת (env)~~ → חסר Mongo + Cloudinary  
 2. ~~טלפון / WhatsApp / אימייל~~  
 3. תמונת אלכס (+ טקסט ורישיון הושלמו)  
 4. שכונות מדויקות  
