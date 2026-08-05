@@ -20,7 +20,7 @@ export default function CookiesPage() {
           <h2 className="font-display text-xl text-text">עוגיות חיוניות</h2>
           <ul className="mt-2 list-disc space-y-1 pe-5">
             <li>
-              עוגיות session להתחברות אדמין / משתמש (אבטחה, אינן מיועדות לפרסום)
+              עוגיות session להתחברות משתמשים רשומים (אבטחה, אינן מיועדות לפרסום)
             </li>
             <li>
               במצב דמו מקומי — נתונים ב־localStorage בדפדפן בלבד (אינם עוגיות
