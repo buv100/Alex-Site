@@ -5,7 +5,9 @@ import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useDemo } from "@/components/providers/DemoProvider";
 import { getAdminDict } from "@/lib/i18n/admin";
-import { DEMO_ADMIN, siteConfig } from "@/lib/site";
+import { siteConfig } from "@/lib/site";
+
+const isProd = process.env.NODE_ENV === "production";
 
 export default function AdminLoginPage() {
   const { loginAdmin, markAdminLoggedIn, adminLoggedIn, adminLocale } =
@@ -26,14 +28,13 @@ export default function AdminLoginPage() {
     setError("");
     setLoading(true);
 
-    // 1) Demo / local credentials first (no registration needed)
-    if (loginAdmin(username, password)) {
+    // Local demo credentials only (never in production build)
+    if (!isProd && loginAdmin(username, password)) {
       setLoading(false);
       router.push("/admin");
       return;
     }
 
-    // 2) NextAuth (when AUTH_SECRET + ADMIN_* are configured)
     try {
       const result = await signIn("admin", {
         username,
@@ -48,13 +49,7 @@ export default function AdminLoginPage() {
         return;
       }
 
-      if (result?.error === "Configuration") {
-        setError(
-          "חסרה הגדרת AUTH_SECRET בשרת. בדמו השתמשו ב: alex / alex-demo-2026",
-        );
-      } else {
-        setError("שם משתמש או סיסמה שגויים");
-      }
+      setError("שם משתמש או סיסמה שגויים");
     } catch {
       setError("שם משתמש או סיסמה שגויים");
     }
@@ -71,8 +66,6 @@ export default function AdminLoginPage() {
       <p className="mt-2 text-sm text-text-muted">{siteConfig.brandName}</p>
       <p className="mt-3 rounded border border-border bg-bg-elevated p-3 text-sm text-text-muted">
         כניסת מנהל לאלכס בלבד — <strong>אין צורך להירשם</strong>.
-        <br />
-        הרשמה באתר מיועדת רק ללקוחות שרוצים מועדפים.
       </p>
       <form onSubmit={onSubmit} className="mt-6 space-y-4">
         <div className="field">
@@ -109,10 +102,6 @@ export default function AdminLoginPage() {
           {loading ? "…" : t.submitLogin}
         </button>
       </form>
-      <p className="mt-6 text-center text-xs text-text-muted">
-        פרטי דמו: <strong>{DEMO_ADMIN.username}</strong> /{" "}
-        <strong>{DEMO_ADMIN.password}</strong>
-      </p>
     </div>
   );
 }

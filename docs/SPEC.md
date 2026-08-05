@@ -427,9 +427,11 @@ NEXT_PUBLIC_SITE_URL=
 
 ### 10.1 אדמין (מחמיר)
 - משתמש יחיד בלבד.
-- סיסמה חזקה; hash (bcrypt/argon2).
-- Session ב־httpOnly + Secure + SameSite.
-- Rate-limit על `/admin/login`.
+- סיסמה חזקה מ־env (`ADMIN_PASSWORD` / hash); **לא** סיסמת דמו בפרודקשן.
+- Session ב־httpOnly + Secure + SameSite (Auth.js).
+- **שער כניסה סודי:** `ADMIN_ENTRY_SECRET` — בלי `?access=…` תקף (או עוגיית שער) נתיבי `/admin` מופנים לדף הבית כאילו אינם קיימים.
+- **אין לפרסם** קישור ניהול / סיסמאות / `access` ב־GitHub, README או פוטר ציבורי.
+- Rate-limit על `/admin/login` (יעד; מינימום — סיסמה חזקה + שער).
 - כל נתיבי `/admin/*` ו־API כתיבה מוגנים בשרת (לא רק UI).
 - אין חשיפת שדות `owner*` / `internal*` / `exactAddress` / `minPriceNegotiable` ב־API ציבורי — **allowlist** בשכבת ה־DTO.
 

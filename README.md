@@ -2,12 +2,12 @@
 
 תיווך דירות בירושלים — אתר למשתמשים / לקוחות.
 
-## פתיחת האתר (צד משתמש בלבד)
+## פתיחת האתר (צד משתמש)
 
 **https://alex-nekasim.vercel.app**
 
 הקישור מתעדכן אחרי כל פרסום.  
-אין כאן כניסת מנהל לאלכס — רק גלישת נכסים, יצירת קשר ומועדפים.
+גלישת נכסים, יצירת קשר ומועדפים בלבד.
 
 ---
 
@@ -21,9 +21,7 @@ npm run dev
 
 http://localhost:3000
 
-אדמין של אלכס: [https://alex-nekasim.vercel.app/admin/login](https://alex-nekasim.vercel.app/admin/login)  
-(אין קישור בפוטר הציבורי — רק מי שיודע את הכתובת נכנס; דורש התחברות.  
-מקומית: `http://localhost:3000/admin/login` אחרי `npm run dev`.)
+ניהול פנימי מוגדר מקומית דרך משתני סביבה — **אין לפרסם קישורי ניהול או סיסמאות ב־GitHub / README**.
 
 ### מצבי עבודה
 
@@ -38,6 +36,6 @@ http://localhost:3000
 
 ## מסמכים
 
-- [docs/SPEC.md](docs/SPEC.md)
-- [docs/PROJECT_RULES.md](docs/PROJECT_RULES.md)
-- [docs/DATA_CHECKLIST.md](docs/DATA_CHECKLIST.md)
+- [`docs/SPEC.md`](docs/SPEC.md)
+- [`docs/PROJECT_RULES.md`](docs/PROJECT_RULES.md)
+- [`docs/DATA_CHECKLIST.md`](docs/DATA_CHECKLIST.md)

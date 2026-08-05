@@ -255,6 +255,8 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     setAdminLocale: (l) => persist((p) => ({ ...p, adminLocale: l })),
     refreshFromServer,
     loginAdmin: (username, password) => {
+      // Never accept hardcoded demo credentials in production builds
+      if (process.env.NODE_ENV === "production") return false;
       const ok =
         username.trim() === DEMO_ADMIN.username &&
         password === DEMO_ADMIN.password;
