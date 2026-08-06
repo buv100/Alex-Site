@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -18,6 +17,7 @@ import {
   sharePropertyMessage,
 } from "@/lib/whatsapp";
 import { BrokerDisclosure } from "@/components/legal/BrokerDisclosure";
+import { PropertyPhoto } from "@/components/property/PropertyPhoto";
 
 export default function PropertyDetailClient() {
   const params = useParams<{ id: string }>();
@@ -68,13 +68,11 @@ export default function PropertyDetailClient() {
         <div>
           <div className="relative aspect-[4/3] overflow-hidden border border-border bg-surface">
             {property.images[activeImg] && (
-              <Image
+              <PropertyPhoto
                 src={property.images[activeImg].url}
                 alt={property.images[activeImg].alt}
                 fill
                 className="object-cover"
-                priority
-                sizes="(max-width: 1024px) 100vw, 50vw"
               />
             )}
           </div>
@@ -90,12 +88,11 @@ export default function PropertyDetailClient() {
                   onClick={() => setActiveImg(i)}
                   aria-label={`תמונה ${i + 1}`}
                 >
-                  <Image
+                  <PropertyPhoto
                     src={img.url}
                     alt={`תמונה ${i + 1} מתוך ${property.images.length} — ${property.title}`}
                     fill
                     className="object-cover"
-                    sizes="96px"
                   />
                 </button>
               ))}

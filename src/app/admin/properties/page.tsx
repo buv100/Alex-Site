@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useDemo } from "@/components/providers/DemoProvider";
 import { getAdminDict } from "@/lib/i18n/admin";
 import { formatPrice, statusLabelHe } from "@/lib/format";
 import { sharePropertyMessage } from "@/lib/whatsapp";
+import { PropertyPhoto } from "@/components/property/PropertyPhoto";
 import type { PropertyStatus } from "@/lib/types";
 
 export default function AdminPropertiesPage() {
@@ -98,12 +98,11 @@ export default function AdminPropertiesPage() {
                 <div className="flex gap-3 p-3">
                   <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded bg-surface">
                     {cover ? (
-                      <Image
+                      <PropertyPhoto
                         src={cover.url}
                         alt={cover.alt || p.title}
                         fill
                         className="object-cover"
-                        sizes="96px"
                       />
                     ) : (
                       <span className="flex h-full items-center justify-center text-[10px] text-text-muted">
@@ -139,8 +138,8 @@ export default function AdminPropertiesPage() {
                     <button
                       type="button"
                       className="btn btn-primary min-h-11 px-3 text-sm"
-                      onClick={() => {
-                        const res = setPropertyStatus(p.id, "published");
+                      onClick={async () => {
+                        const res = await setPropertyStatus(p.id, "published");
                         if (!res.ok) alert(t.cannotPublishNoImage);
                       }}
                     >

@@ -4,13 +4,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDemo } from "@/components/providers/DemoProvider";
 import { getAdminDict } from "@/lib/i18n/admin";
+import { fileToCompressedDataUrl } from "@/lib/client-image";
 import { siteConfig } from "@/lib/site";
 import type { Property, PropertyType, DealType } from "@/lib/types";
 
 export function PropertyForm({ initial }: { initial: Property }) {
   const {
     saveProperty,
-    setPropertyStatus,
     softDeleteProperty,
     restoreProperty,
     adminLocale,
@@ -19,11 +19,19 @@ export function PropertyForm({ initial }: { initial: Property }) {
   const router = useRouter();
   const [form, setForm] = useState<Property>(initial);
   const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
   const [imageAlt, setImageAlt] = useState("");
 
   function setField<K extends keyof Property>(key: K, value: Property[K]) {
     setForm((f) => ({ ...f, [key]: value }));
+  }
+
+  function errorMessage(code: string) {
+    if (code === "cannot_publish_no_image") return t.cannotPublishNoImage;
+    if (code === "unauthorized") return t.sessionExpired;
+    if (code === "image_too_large") return t.imageTooLarge;
+    return t.saveFailed;
   }
 
   function addImage() {
@@ -64,16 +72,18 @@ export function PropertyForm({ initial }: { initial: Property }) {
   }
 
   async function onSave() {
+    setBusy(true);
     const next =
       form.status === "published" && form.images.length < 1
         ? { ...form, status: "draft" as const }
         : form;
     const res = await saveProperty(next);
+    setBusy(false);
     if (!res.ok) {
-      setMsg(t.cannotPublishNoImage);
+      setMsg(errorMessage(res.error));
       return;
     }
-    setForm(next);
+    setForm(res.property);
     setMsg(t.saved);
   }
 
@@ -82,15 +92,20 @@ export function PropertyForm({ initial }: { initial: Property }) {
       setMsg(t.cannotPublishNoImage);
       return;
     }
-    const next = { ...form, status: "published" as const };
+    setBusy(true);
+    const next = {
+      ...form,
+      status: "published" as const,
+      publishedAt: form.publishedAt ?? new Date().toISOString(),
+    };
     const res = await saveProperty(next);
+    setBusy(false);
     if (!res.ok) {
-      setMsg(t.cannotPublishNoImage);
+      setMsg(errorMessage(res.error));
       return;
     }
-    setPropertyStatus(form.id, "published");
-    setForm(next);
-    setMsg(t.publish);
+    setForm(res.property);
+    setMsg(t.publishedOk);
   }
 
   return (
@@ -332,7 +347,8 @@ export function PropertyForm({ initial }: { initial: Property }) {
             onChange={async (e) => {
               const file = e.target.files?.[0];
               if (!file) return;
-              setMsg("מעלה תמונה…");
+              setBusy(true);
+              setMsg(t.uploading);
               try {
                 const body = new FormData();
                 body.append("file", file);
@@ -340,21 +356,29 @@ export function PropertyForm({ initial }: { initial: Property }) {
                   method: "POST",
                   body,
                 });
-                if (!res.ok) {
-                  const err = await res.json().catch(() => ({}));
-                  setMsg(
-                    (err as { error?: string }).error ||
-                      "העלאה נכשלה — נסו קישור URL",
-                  );
-                  return;
+                let url: string | null = null;
+                if (res.ok) {
+                  const data = (await res.json()) as { url: string };
+                  url = data.url;
+                } else {
+                  // No Cloudinary (or upload error): compress locally and embed.
+                  try {
+                    url = await fileToCompressedDataUrl(file);
+                  } catch (err) {
+                    const code =
+                      err instanceof Error ? err.message : "upload_failed";
+                    setMsg(errorMessage(code));
+                    setBusy(false);
+                    e.target.value = "";
+                    return;
+                  }
                 }
-                const data = (await res.json()) as { url: string };
                 setForm((f) => ({
                   ...f,
                   images: [
                     ...f.images,
                     {
-                      url: data.url,
+                      url: url!,
                       alt: imageAlt.trim() || f.title || "תמונת נכס",
                       order: f.images.length,
                     },
@@ -362,8 +386,9 @@ export function PropertyForm({ initial }: { initial: Property }) {
                 }));
                 setMsg(t.saved);
               } catch {
-                setMsg("העלאה נכשלה");
+                setMsg(t.uploadFailed);
               }
+              setBusy(false);
               e.target.value = "";
             }}
           />
@@ -468,18 +493,21 @@ export function PropertyForm({ initial }: { initial: Property }) {
         </div>
       </section>
 
-      {msg && (
-        <p className="text-sm text-accent" role="status">
-          {msg}
-        </p>
-      )}
-
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-bg-elevated/95 px-3 pt-2 backdrop-blur pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+        {msg && (
+          <p
+            className="mx-auto mb-2 max-w-3xl text-center text-sm text-accent"
+            role="status"
+          >
+            {msg}
+          </p>
+        )}
         <div className="mx-auto flex max-w-3xl gap-2">
           <button
             type="button"
             className="btn btn-primary min-h-11 flex-1 py-2 text-sm"
             onClick={onSave}
+            disabled={busy}
           >
             {t.save}
           </button>
@@ -487,15 +515,22 @@ export function PropertyForm({ initial }: { initial: Property }) {
             type="button"
             className="btn btn-ghost min-h-11 flex-1 py-2 text-sm"
             onClick={onPublish}
+            disabled={busy}
           >
             {t.publish}
           </button>
           <button
             type="button"
             className="btn btn-ghost min-h-11 shrink-0 px-3 py-2 text-sm"
-            onClick={() => {
-              saveProperty(form);
-              router.push(`/admin/properties/${form.id}/preview`);
+            disabled={busy}
+            onClick={async () => {
+              const res = await saveProperty(form);
+              if (!res.ok) {
+                setMsg(errorMessage(res.error));
+                return;
+              }
+              setForm(res.property);
+              router.push(`/admin/properties/${res.property.id}/preview`);
             }}
           >
             {t.preview}
@@ -509,10 +544,13 @@ export function PropertyForm({ initial }: { initial: Property }) {
             <button
               type="button"
               className="btn btn-ghost min-h-10 px-3 py-1.5 text-xs"
-              onClick={() => {
-                saveProperty(form);
-                setPropertyStatus(form.id, "sold");
-                setForm((f) => ({ ...f, status: "sold" }));
+              onClick={async () => {
+                const res = await saveProperty({ ...form, status: "sold" });
+                if (!res.ok) {
+                  setMsg(errorMessage(res.error));
+                  return;
+                }
+                setForm(res.property);
               }}
             >
               {t.markSold}
@@ -520,10 +558,13 @@ export function PropertyForm({ initial }: { initial: Property }) {
             <button
               type="button"
               className="btn btn-ghost min-h-10 px-3 py-1.5 text-xs"
-              onClick={() => {
-                saveProperty(form);
-                setPropertyStatus(form.id, "rented");
-                setForm((f) => ({ ...f, status: "rented" }));
+              onClick={async () => {
+                const res = await saveProperty({ ...form, status: "rented" });
+                if (!res.ok) {
+                  setMsg(errorMessage(res.error));
+                  return;
+                }
+                setForm(res.property);
               }}
             >
               {t.markRented}

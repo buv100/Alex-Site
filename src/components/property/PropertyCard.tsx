@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import type { PublicProperty } from "@/lib/types";
 import {
   dealTypeLabel,
@@ -10,6 +9,7 @@ import {
   publicAddress,
 } from "@/lib/format";
 import { BrokerDisclosure } from "@/components/legal/BrokerDisclosure";
+import { PropertyPhoto } from "@/components/property/PropertyPhoto";
 
 export function PropertyCard({ property }: { property: PublicProperty }) {
   const cover = property.images[0];
@@ -19,12 +19,11 @@ export function PropertyCard({ property }: { property: PublicProperty }) {
       <Link href={`/properties/${property.id}`} className="block">
         <div className="relative aspect-[4/3] overflow-hidden bg-surface">
           {cover ? (
-            <Image
+            <PropertyPhoto
               src={cover.url}
               alt={cover.alt}
               fill
               className="object-cover transition duration-500 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, 33vw"
             />
           ) : (
             <div className="flex h-full items-center justify-center text-text-muted">

@@ -62,13 +62,15 @@ interface DemoContextValue {
   getPublicPropertyById: (id: string) => ReturnType<typeof toPublicProperty> | undefined;
   saveProperty: (
     property: Property,
-  ) =>
-    | { ok: true }
-    | { ok: false; error: string }
-    | Promise<{ ok: true } | { ok: false; error: string }>;
+  ) => Promise<
+    { ok: true; property: Property } | { ok: false; error: string }
+  >;
   createPropertyDraft: (partial?: Partial<Property>) => Property;
   createProperty: (partial?: Partial<Property>) => Property;
-  setPropertyStatus: (id: string, status: PropertyStatus) => { ok: true } | { ok: false; error: string };
+  setPropertyStatus: (
+    id: string,
+    status: PropertyStatus,
+  ) => Promise<{ ok: true } | { ok: false; error: string }>;
   softDeleteProperty: (id: string) => void;
   restoreProperty: (id: string) => void;
   addLead: (
@@ -156,14 +158,17 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       const adm = adminRes.ok ? await adminRes.json() : null;
       const leadsJson = leadsRes.ok ? await leadsRes.json() : { leads: [] };
 
+      const fromAdmin =
+        adm && Array.isArray(adm.properties) ? (adm.properties as Property[]) : null;
+      const fromPublic = Array.isArray(pub.properties)
+        ? (pub.properties as Property[])
+        : [];
+
       setState((prev) => ({
         ...prev,
-        properties: adm?.properties?.length
-          ? adm.properties
-          : pub.properties?.length
-            ? pub.properties
-            : prev.properties,
-        leads: leadsJson.leads?.length ? leadsJson.leads : prev.leads,
+        // In server mode never fall back to demo seed — empty DB means empty list.
+        properties: fromAdmin ?? fromPublic,
+        leads: Array.isArray(leadsJson.leads) ? leadsJson.leads : prev.leads,
       }));
     } catch {
       /* keep local */
@@ -348,7 +353,13 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         );
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
-          return { ok: false, error: (err as { error?: string }).error || "save_failed" };
+          if (res.status === 401) {
+            return { ok: false, error: "unauthorized" };
+          }
+          return {
+            ok: false,
+            error: (err as { error?: string }).error || "save_failed",
+          };
         }
         const data = await res.json();
         const saved = data.property as Property;
@@ -362,7 +373,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
               )
             : [...p.properties, saved],
         }));
-        return { ok: true };
+        return { ok: true, property: saved };
       }
 
       persist((p) => ({
@@ -371,7 +382,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
           ? p.properties.map((x) => (x.id === next.id ? next : x))
           : [...p.properties, next],
       }));
-      return { ok: true };
+      return { ok: true, property: next };
     },
     createPropertyDraft: (partial) => {
       return { ...emptyProperty(), ...partial, id: uid("p") };
@@ -381,7 +392,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       persist((prev) => ({ ...prev, properties: [...prev.properties, p] }));
       return p;
     },
-    setPropertyStatus: (id, status) => {
+    setPropertyStatus: async (id, status) => {
       const prop = state.properties.find((p) => p.id === id);
       if (!prop) return { ok: false, error: "not_found" };
       if (status === "published" && prop.images.length < 1) {
@@ -396,17 +407,30 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         archivedAt:
           status === "sold" || status === "rented" ? now : prop.archivedAt,
       };
-      persist((p) => ({
-        ...p,
-        properties: p.properties.map((x) => (x.id === id ? updated : x)),
-      }));
+
       if (serverMode) {
-        void fetch(`/api/properties/${id}`, {
+        const res = await fetch(`/api/properties/${id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(updated),
         });
+        if (!res.ok) {
+          if (res.status === 401) return { ok: false, error: "unauthorized" };
+          return { ok: false, error: "save_failed" };
+        }
+        const data = await res.json();
+        const saved = data.property as Property;
+        persist((p) => ({
+          ...p,
+          properties: p.properties.map((x) => (x.id === id ? saved : x)),
+        }));
+        return { ok: true };
       }
+
+      persist((p) => ({
+        ...p,
+        properties: p.properties.map((x) => (x.id === id ? updated : x)),
+      }));
       return { ok: true };
     },
     softDeleteProperty: (id) => {

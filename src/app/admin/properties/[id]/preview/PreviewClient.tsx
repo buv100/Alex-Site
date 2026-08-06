@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -14,6 +13,7 @@ import {
   statusLabelHe,
 } from "@/lib/format";
 import { sharePropertyMessage } from "@/lib/whatsapp";
+import { PropertyPhoto } from "@/components/property/PropertyPhoto";
 
 export default function PreviewClient() {
   const params = useParams<{ id: string }>();
@@ -70,8 +70,8 @@ export default function PreviewClient() {
             <button
               type="button"
               className="btn btn-primary min-h-11 px-3 text-sm"
-              onClick={() => {
-                const res = setPropertyStatus(p.id, "published");
+              onClick={async () => {
+                const res = await setPropertyStatus(p.id, "published");
                 if (!res.ok) alert(t.cannotPublishNoImage);
               }}
             >
@@ -93,12 +93,11 @@ export default function PreviewClient() {
 
       {p.images[0] && (
         <div className="relative aspect-[4/3] overflow-hidden border border-border">
-          <Image
+          <PropertyPhoto
             src={p.images[0].url}
             alt={p.images[0].alt}
             fill
             className="object-cover"
-            sizes="100vw"
           />
         </div>
       )}
