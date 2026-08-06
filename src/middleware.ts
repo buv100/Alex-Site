@@ -20,6 +20,10 @@ function adminEnabled() {
   return true;
 }
 
+function isLoginPath(pathname: string) {
+  return pathname === "/admin/login" || pathname.startsWith("/admin/login/");
+}
+
 export default auth((req) => {
   const { pathname } = req.nextUrl;
 
@@ -31,7 +35,7 @@ export default auth((req) => {
     return denyAdmin(req);
   }
 
-  // Real route handler unlocks + redirects — do not rewrite (causes client 404).
+  // Unlock route — sets gate cookie and redirects to login.
   if (pathname.startsWith("/admin/g/")) {
     return NextResponse.next();
   }
@@ -43,13 +47,17 @@ export default auth((req) => {
     return res;
   }
 
+  // From here: not an authenticated admin.
   const entrySecret = process.env.ADMIN_ENTRY_SECRET?.trim();
   if (entrySecret) {
     const access = req.nextUrl.searchParams.get("access");
     const hasGate = req.cookies.get(GATE_COOKIE)?.value === "1";
 
     if (access && access === entrySecret) {
-      const res = NextResponse.next();
+      const url = req.nextUrl.clone();
+      url.pathname = "/admin/login";
+      url.search = "";
+      const res = NextResponse.redirect(url);
       applyGateCookie(res);
       return res;
     }
@@ -59,14 +67,16 @@ export default auth((req) => {
     }
   }
 
-  if (!pathname.startsWith("/admin/login")) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/admin/login";
-    url.search = "";
-    return NextResponse.redirect(url);
+  // Gate cookie (or no gate configured) only unlocks the login page —
+  // never the rest of the admin UI without a real admin session.
+  if (isLoginPath(pathname)) {
+    return NextResponse.next();
   }
 
-  return NextResponse.next();
+  const url = req.nextUrl.clone();
+  url.pathname = "/admin/login";
+  url.search = "";
+  return NextResponse.redirect(url);
 });
 
 export const config = {

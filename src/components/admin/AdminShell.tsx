@@ -8,21 +8,16 @@ import { useDemo } from "@/components/providers/DemoProvider";
 import { getAdminDict } from "@/lib/i18n/admin";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
-  const {
-    adminLoggedIn,
-    adminLocale,
-    setAdminLocale,
-    logoutAdmin,
-    ready,
-    serverMode,
-  } = useDemo();
+  const { adminLocale, setAdminLocale, logoutAdmin, ready, serverMode } =
+    useDemo();
   const { data: session, status } = useSession();
   const t = getAdminDict(adminLocale);
   const pathname = usePathname();
   const router = useRouter();
   const isLogin = pathname === "/admin/login";
+  // Authorization is session-only — never trust localStorage / demo flags.
   const isAdminSession = session?.user?.role === "admin";
-  const allowed = adminLoggedIn || isAdminSession;
+  const allowed = isAdminSession;
 
   useEffect(() => {
     if (!ready || isLogin) return;
@@ -36,7 +31,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     router.replace("/admin/login");
   }
 
-  if (!ready || (!isLogin && status === "loading" && !adminLoggedIn)) {
+  if (!ready || (!isLogin && status === "loading")) {
     return <p className="p-6 text-text-muted">…</p>;
   }
 

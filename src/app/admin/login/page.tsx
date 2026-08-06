@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { useDemo } from "@/components/providers/DemoProvider";
 import { getAdminDict } from "@/lib/i18n/admin";
 import { siteConfig } from "@/lib/site";
@@ -10,8 +10,7 @@ import { siteConfig } from "@/lib/site";
 const isProd = process.env.NODE_ENV === "production";
 
 function AdminLoginForm() {
-  const { loginAdmin, markAdminLoggedIn, adminLoggedIn, adminLocale } =
-    useDemo();
+  const { loginAdmin, adminLocale } = useDemo();
   const t = getAdminDict(adminLocale);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -30,15 +29,12 @@ function AdminLoginForm() {
     }
   }, [searchParams]);
 
-  useEffect(() => {
-    if (adminLoggedIn) router.replace("/admin");
-  }, [adminLoggedIn, router]);
-
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
 
+    // Local demo only — never used in production builds.
     if (!isProd && loginAdmin(username, password)) {
       setLoading(false);
       router.push("/admin");
@@ -52,20 +48,23 @@ function AdminLoginForm() {
         redirect: false,
       });
 
-      if (result?.ok) {
-        markAdminLoggedIn();
-        // Full page load so the session cookie is always sent to middleware.
-        window.location.assign("/admin");
+      if (!result || result.error || !result.ok) {
+        setError("שם משתמש או סיסמה שגויים");
+        setLoading(false);
         return;
       }
 
-      const msg =
-        result?.error === "CredentialsSignin"
-          ? "שם משתמש או סיסמה שגויים"
-          : result?.error
-            ? `שגיאת התחברות (${result.error})`
-            : "שם משתמש או סיסמה שגויים";
-      setError(msg);
+      // Double-check: cookie session must actually be admin.
+      const session = await getSession();
+      if (session?.user?.role !== "admin") {
+        setError("שם משתמש או סיסמה שגויים");
+        setLoading(false);
+        return;
+      }
+
+      // Full page load so the session cookie is always sent to middleware.
+      window.location.assign("/admin");
+      return;
     } catch {
       setError("שגיאת רשת — נסו שוב");
     }

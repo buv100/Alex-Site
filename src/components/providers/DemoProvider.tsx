@@ -201,7 +201,8 @@ export function DemoProvider({ children }: { children: ReactNode }) {
             properties: parsed.properties ?? [],
             leads: parsed.leads ?? [],
             users: parsed.users ?? [],
-            adminLoggedIn: Boolean(parsed.adminLoggedIn),
+            // Never restore admin auth from localStorage — session only.
+            adminLoggedIn: false,
             adminLocale: parsed.adminLocale === "ru" ? "ru" : "he",
             currentUserId: parsed.currentUserId ?? null,
           });
