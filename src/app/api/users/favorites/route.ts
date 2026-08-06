@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { connectDb } from "@/lib/db";
-import { UserModel } from "@/lib/models/User";
-import mongoose from "mongoose";
+import { users } from "@/lib/db/schema";
 
 export async function GET() {
   const session = await auth();
@@ -11,10 +11,14 @@ export async function GET() {
   }
 
   try {
-    await connectDb();
-    const user = await UserModel.findById(session.user.id);
+    const db = await connectDb();
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, session.user.id))
+      .limit(1);
     return NextResponse.json({
-      favorites: (user?.favorites ?? []).map(String),
+      favorites: user?.favorites ?? [],
     });
   } catch {
     return NextResponse.json({ favorites: [] });
@@ -29,32 +33,33 @@ export async function POST(req: Request) {
 
   try {
     const { propertyId } = await req.json();
-    if (!propertyId || !mongoose.Types.ObjectId.isValid(propertyId)) {
+    if (!propertyId || typeof propertyId !== "string") {
       return NextResponse.json({ error: "Invalid id" }, { status: 400 });
     }
 
-    await connectDb();
-    const user = await UserModel.findById(session.user.id);
+    const db = await connectDb();
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, session.user.id))
+      .limit(1);
+
     if (!user) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    const id = new mongoose.Types.ObjectId(propertyId);
-    const has = user.favorites.some(
-      (f: mongoose.Types.ObjectId) => String(f) === propertyId,
-    );
-    if (has) {
-      user.favorites = user.favorites.filter(
-        (f: mongoose.Types.ObjectId) => String(f) !== propertyId,
-      );
-    } else {
-      user.favorites.push(id);
-    }
-    await user.save();
+    const current = user.favorites ?? [];
+    const has = current.includes(propertyId);
+    const favorites = has
+      ? current.filter((f) => f !== propertyId)
+      : [...current, propertyId];
 
-    return NextResponse.json({
-      favorites: user.favorites.map((f: mongoose.Types.ObjectId) => String(f)),
-    });
+    await db
+      .update(users)
+      .set({ favorites, updatedAt: new Date() })
+      .where(eq(users.id, user.id));
+
+    return NextResponse.json({ favorites });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Failed" }, { status: 500 });

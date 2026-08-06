@@ -333,11 +333,14 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       }
 
       if (serverMode) {
-        const isMongoId = /^[a-f\d]{24}$/i.test(next.id);
+        const isPersisted =
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+            next.id,
+          );
         const res = await fetch(
-          isMongoId ? `/api/properties/${next.id}` : "/api/properties",
+          isPersisted ? `/api/properties/${next.id}` : "/api/properties",
           {
-            method: isMongoId ? "PUT" : "POST",
+            method: isPersisted ? "PUT" : "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(next),
           },

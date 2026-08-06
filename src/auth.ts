@@ -1,9 +1,10 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { eq, and } from "drizzle-orm";
 import { authConfig } from "@/auth.config";
 import { connectDb } from "@/lib/db";
-import { UserModel } from "@/lib/models/User";
+import { users } from "@/lib/db/schema";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -21,14 +22,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const password = String(credentials?.password ?? "");
         if (!phone || !password) return null;
 
-        await connectDb();
-        const user = await UserModel.findOne({ phone, role: "user" });
+        const db = await connectDb();
+        const [user] = await db
+          .select()
+          .from(users)
+          .where(and(eq(users.phone, phone), eq(users.role, "user")))
+          .limit(1);
         if (!user) return null;
         const ok = await bcrypt.compare(password, user.passwordHash);
         if (!ok) return null;
 
         return {
-          id: String(user._id),
+          id: user.id,
           name: user.name,
           email: user.email ?? undefined,
           role: "user",

@@ -7,23 +7,16 @@
 
 ## 1. דחוף ל־Phase 2 (תשתית — אתה יוצר חשבונות)
 
-- [ ] **MongoDB מנוהל חינמי** → `MONGODB_URI` (אל תדביק סיסמאות ב־git / README)
+- [ ] **Neon Postgres Free** → `DATABASE_URL` (אל תדביק סיסמאות ב־git / README)
 
-  **עדיפות 1 — OVHcloud Discovery (חינם):**  
-  1. [MongoDB Discovery](https://www.ovhcloud.com/en/lp/mongodb-discovery/) / Public Cloud → Databases → MongoDB → תוכנית **Discovery** / `db2-free`  
-  2. רשת **Public**, משתמש + סיסמה  
-  3. העתק Connection String (`mongodb://` או `mongodb+srv://`) עם שם DB `alex-nekasim`  
-  4. הערה: לפי OVH, Discovery מתוכנן להסתיים ב־**31/08/2026** — אם לא זמין, עבור לחלופה.
+  1. [console.neon.tech/signup](https://console.neon.tech/signup) — התחברות עם GitHub / Google  
+  2. Create project (למשל `alex-nekasim`)  
+  3. העתק **Connection string** (`postgresql://…`) — עדיף pooled / pooler  
+  4. הוסף ב־Vercel env בשם `DATABASE_URL` (Production) או שלח למפתח מחוץ לצ׳אט ציבורי  
 
-  **עדיפות 2 — Clever Cloud Mongo (חינם ~500MB):**  
-  1. [clever.cloud](https://www.clever.cloud/) → Add-on MongoDB (free plan)  
-  2. העתק `MONGODB_ADDON_URI` (לעתים הוסף `?directConnection=true`)
+  מדריך מפורט: [`docs/NEON_SETUP.md`](./NEON_SETUP.md)
 
-  **עדיפות 3 — MongoDB Atlas M0** אם מוצאים Free בממשק.
-
-  אחרי שיש מחרוזת: הוסף ב־Vercel env בשם `MONGODB_URI` (Production) או שלח למפתח מחוץ לצ׳אט ציבורי.
-
-  מדריך מפורט: [`docs/MONGO_SETUP.md`](./MONGO_SETUP.md)
+  (MongoDB Atlas Free לא תמיד מופיע בממשק — לכן עברנו ל־Neon.)
 - [ ] **Cloudinary** (חינם) להעלאת תמונות מהטלפון:  
   `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
 - [x] **אימייל + סיסמאות שרת** (מוגדר ב־Vercel; לא ב־git)
@@ -94,7 +87,7 @@
 
 ## 7. סדר מומלץ למשלוח
 
-1. ~~Mongo URI + Cloudinary + סיסמאות שרת (env)~~ → חסר Mongo + Cloudinary  
+1. ~~DB URI + Cloudinary + סיסמאות שרת (env)~~ → חסר Neon (`DATABASE_URL`) + Cloudinary  
 2. ~~טלפון / WhatsApp / אימייל~~  
 3. תמונת אלכס (+ טקסט ורישיון הושלמו)  
 4. שכונות מדויקות  

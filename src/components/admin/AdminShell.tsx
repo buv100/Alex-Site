@@ -117,8 +117,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           role="status"
         >
           {adminLocale === "ru"
-            ? "Режим демо: объекты сохраняются в браузере этого телефона. Для общего сервера нужны MongoDB + Cloudinary."
-            : "מצב דמו: נכסים ופניות נשמרים בדפדפן של הטלפון הזה בלבד. לשמירה משותפת בשרת — חיבור MongoDB + Cloudinary."}
+            ? "Режим демо: объекты сохраняются в браузере этого телефона. Для общего сервера нужны Neon (Postgres) + Cloudinary."
+            : "מצב דמו: נכסים ופניות נשמרים בדפדפן של הטלפון הזה בלבד. לשמירה משותפת בשרת — חיבור Neon (Postgres) + Cloudinary."}
         </div>
       )}
       <main className="mx-auto max-w-3xl px-3 py-5">{children}</main>

@@ -69,7 +69,7 @@ lib/
   db/
   validations/
   i18n/
-models/              # Mongo schemas / types
+models/              # (legacy path) — schema ב־`src/lib/db/schema.ts` (Drizzle / Postgres)
 public/
 docs/                # SPEC, RULES, CHECKLIST
 ```

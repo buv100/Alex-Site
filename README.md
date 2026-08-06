@@ -28,10 +28,10 @@ npm run build
 
 | מצב | מתי | התנהגות |
 |-----|-----|---------|
-| **דמו** | אין `MONGODB_URI` | נתונים ב־localStorage של הדפדפן |
-| **שרת** | יש `MONGODB_URI` (+ Cloudinary להעלאות) | נתונים משותפים בשרת |
+| **דמו** | אין `DATABASE_URL` | נתונים ב־localStorage של הדפדפן |
+| **שרת** | יש `DATABASE_URL` (+ Cloudinary להעלאות) | נתונים משותפים בשרת |
 
-`MONGODB_URI` = Mongo מנוהל חינמי: **OVHcloud Discovery**, **Clever Cloud**, או **Atlas M0** — ראו [`docs/DATA_CHECKLIST.md`](docs/DATA_CHECKLIST.md) ו־[`docs/MONGO_SETUP.md`](docs/MONGO_SETUP.md).
+`DATABASE_URL` = **Neon Postgres Free** — ראו [`docs/DATA_CHECKLIST.md`](docs/DATA_CHECKLIST.md) ו־[`docs/NEON_SETUP.md`](docs/NEON_SETUP.md).
 
 ## מסמכים
 

@@ -1,17 +1,17 @@
-# Sets MONGODB_URI on Vercel Production and redeploys.
-# Usage: .\scripts\set-mongodb-uri.ps1 "mongodb://user:pass@host:27017/alex-nekasim"
+# Sets DATABASE_URL on Vercel Production and redeploys.
+# Usage: .\scripts\set-database-url.ps1 "postgresql://user:pass@host/db?sslmode=require"
 param(
   [Parameter(Mandatory = $true)]
   [string]$Uri
 )
 
 $ErrorActionPreference = "Stop"
-if ($Uri -notmatch "^mongodb(\+srv)?://") {
-  throw "URI must start with mongodb:// or mongodb+srv://"
+if ($Uri -notmatch "^postgres(ql)?://") {
+  throw "URI must start with postgresql:// or postgres://"
 }
 
 # stdin pipe for non-interactive vercel env add
-$Uri | npx vercel env add MONGODB_URI production --force
+$Uri | npx vercel env add DATABASE_URL production --force
 if ($LASTEXITCODE -ne 0) { throw "vercel env add failed" }
 
 npx vercel --yes --prod

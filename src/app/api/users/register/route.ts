@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { connectDb } from "@/lib/db";
-import { UserModel } from "@/lib/models/User";
+import { users } from "@/lib/db/schema";
 
 export async function POST(req: Request) {
   try {
-    await connectDb();
+    const db = await connectDb();
     const body = await req.json();
     const { name, phone, password, privacyConsent } = body;
 
@@ -22,7 +23,13 @@ export async function POST(req: Request) {
       );
     }
 
-    const exists = await UserModel.findOne({ phone: phone.trim() });
+    const phoneTrim = phone.trim();
+    const [exists] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.phone, phoneTrim))
+      .limit(1);
+
     if (exists) {
       return NextResponse.json(
         { error: "מספר הטלפון כבר רשום" },
@@ -31,18 +38,25 @@ export async function POST(req: Request) {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = await UserModel.create({
-      name: name.trim(),
-      phone: phone.trim(),
-      passwordHash,
-      role: "user",
-      favorites: [],
-      privacyConsentAt: new Date(),
-    });
+    const now = new Date();
+    const [user] = await db
+      .insert(users)
+      .values({
+        id: crypto.randomUUID(),
+        name: name.trim(),
+        phone: phoneTrim,
+        passwordHash,
+        role: "user",
+        favorites: [],
+        privacyConsentAt: now,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
 
     return NextResponse.json({
       user: {
-        id: String(user._id),
+        id: user.id,
         name: user.name,
         phone: user.phone,
         favorites: [],

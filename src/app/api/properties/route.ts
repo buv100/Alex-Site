@@ -1,24 +1,33 @@
 import { NextResponse } from "next/server";
+import { desc, eq, isNull } from "drizzle-orm";
 import { auth } from "@/auth";
 import { connectDb } from "@/lib/db";
-import { PropertyModel } from "@/lib/models/Property";
-import { mapProperty } from "@/lib/mappers";
-import { toPublicProperty } from "@/lib/property-public";
-import { isArchivedPublicly, isListedPublicly } from "@/lib/property-public";
+import { properties } from "@/lib/db/schema";
+import { mapProperty, propertyValuesFromBody } from "@/lib/mappers";
+import {
+  isArchivedPublicly,
+  isListedPublicly,
+  toPublicProperty,
+} from "@/lib/property-public";
 
 export async function GET(req: Request) {
   try {
-    await connectDb();
+    const db = await connectDb();
     const { searchParams } = new URL(req.url);
     const scope = searchParams.get("scope") || "public";
     const session = await auth();
     const isAdmin = session?.user?.role === "admin";
 
-    const docs = await PropertyModel.find(
-      scope === "admin" && isAdmin ? {} : { deletedAt: null },
-    ).sort({ updatedAt: -1 });
+    const rows =
+      scope === "admin" && isAdmin
+        ? await db.select().from(properties).orderBy(desc(properties.updatedAt))
+        : await db
+            .select()
+            .from(properties)
+            .where(isNull(properties.deletedAt))
+            .orderBy(desc(properties.updatedAt));
 
-    const mapped = docs.map(mapProperty);
+    const mapped = rows.map(mapProperty);
 
     if (scope === "admin" && isAdmin) {
       return NextResponse.json({ properties: mapped });
@@ -30,7 +39,6 @@ export async function GET(req: Request) {
       });
     }
 
-    // public: shuffle lightly server-side
     const list = mapped.filter(isListedPublicly).map(toPublicProperty);
     for (let i = list.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -53,28 +61,32 @@ export async function POST(req: Request) {
   }
 
   try {
-    await connectDb();
-    const body = await req.json();
-    const {
-      id: _id,
-      createdAt: _c,
-      updatedAt: _u,
-      ...rest
-    } = body as Record<string, unknown>;
+    const db = await connectDb();
+    const body = (await req.json()) as Record<string, unknown>;
+    const values = propertyValuesFromBody(body);
 
-    if (rest.status === "published") {
-      const images = (rest.images as unknown[]) ?? [];
-      if (images.length < 1) {
+    if (values.status === "published") {
+      if (values.images.length < 1) {
         return NextResponse.json(
           { error: "cannot_publish_no_image" },
           { status: 400 },
         );
       }
-      rest.publishedAt = new Date();
+      values.publishedAt = values.publishedAt ?? new Date();
     }
 
-    const doc = await PropertyModel.create(rest);
-    return NextResponse.json({ property: mapProperty(doc) }, { status: 201 });
+    const now = new Date();
+    const [row] = await db
+      .insert(properties)
+      .values({
+        id: crypto.randomUUID(),
+        ...values,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+
+    return NextResponse.json({ property: mapProperty(row) }, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Failed to create" }, { status: 500 });

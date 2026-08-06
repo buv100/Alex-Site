@@ -187,7 +187,7 @@
 
 ---
 
-## 6. מודל נתונים (MongoDB)
+## 6. מודל נתונים (Postgres / Neon)
 
 ### 6.1 `Property`
 
@@ -233,7 +233,7 @@
 | `exactAddress` | string \| null | כתובת מלאה פנימית (אופציונלי) |
 | `deletedAt` | date \| null | soft-delete |
 
-**אין** מזהה נכס ציבורי נפרד (קוד נכס) — משתמשים ב־`_id` פנימי / slug אופציונלי בעתיד.
+**אין** מזהה נכס ציבורי נפרד (קוד נכס) — משתמשים ב־`id` (UUID) פנימי / slug אופציונלי בעתיד.
 
 ### 6.2 `User` (משתמש ציבורי)
 | שדה | סוג | הערות |
@@ -242,7 +242,7 @@
 | `phone` | string | ייחודי מומלץ |
 | `email` | string \| null | אופציונלי |
 | `passwordHash` | string | |
-| `favorites` | ObjectId[] | או אוסף נפרד |
+| `favorites` | string[] (UUID של נכסים) | או אוסף נפרד |
 | `createdAt` | date | |
 | `privacyConsentAt` | date | חותמת הסכמה |
 
@@ -255,7 +255,7 @@
 | `name` | string | |
 | `phone` | string | |
 | `message` | string \| null | |
-| `propertyId` | ObjectId \| null | חובה ל־`property` |
+| `propertyId` | string (UUID) \| null | חובה ל־`property` |
 | `propertyTitle` | string \| null | snapshot |
 | `propertyUrl` | string \| null | snapshot |
 | `status` | enum: `new` \| `in_progress` \| `closed` | |
@@ -348,7 +348,7 @@ draft → (preview) → published → sold | rented → archive
 |------|--------|--------|
 | Frontend/Backend | Next.js (App Router) + TypeScript | |
 | עיצוב | Tailwind CSS + CSS variables למותג | |
-| DB | MongoDB מנוהל **חינמי** | Atlas M0, או חלופה: OVHcloud Discovery / Clever Cloud Mongo free — אותו `MONGODB_URI` |
+| DB | **Neon Postgres Free** (או Mongo מנוהל חינמי אם זמין) | `DATABASE_URL` — מומלץ Neon כי Atlas Free לא תמיד מופיע בממשק |
 | Hosting | Vercel Free | `*.vercel.app` בהתחלה |
 | תמונות | Cloudinary Free (מועדף) או Vercel Blob | אופטימיזציה למובייל |
 | Auth | Auth.js | sessions מאובטחות |
@@ -362,7 +362,7 @@ draft → (preview) → published → sold | rented → archive
 | סביבה | שימוש |
 |--------|--------|
 | Local | פיתוח |
-| Production | Vercel + Mongo מנוהל חינמי (`MONGODB_URI`) — פרויקט אמיתי |
+| Production | Vercel + Neon Postgres Free (`DATABASE_URL`) — פרויקט אמיתי |
 
 Staging נפרד — לא חובה ב־MVP אם אין תקציב/זמן; אפשר preview deployments של Vercel.
 
@@ -372,7 +372,7 @@ Staging נפרד — לא חובה ב־MVP אם אין תקציב/זמן; אפש
 
 ### 9.4 משתני סביבה (לוגיים)
 ```
-MONGODB_URI=
+DATABASE_URL=
 AUTH_SECRET=
 CLOUDINARY_* / BLOB_*
 RESEND_API_KEY= / EMAIL_*
@@ -474,7 +474,7 @@ NEXT_PUBLIC_SITE_URL=
 |-------|------|--------|
 | **0** | מסמכי אפיון + חוקים + checklist | הושלם |
 | **1** | דמו UI ציבורי | mock / localStorage בלי DB |
-| **2** | MongoDB + Auth אמיתי + העלאת תמונות + דיפלוי Vercel | חינם |
+| **2** | Neon Postgres + Auth אמיתי + העלאת תמונות + דיפלוי Vercel | חינם |
 | **3** | תוכן אמיתי + משפטי | |
 | **4** | בוט צ׳אט (§3.9) — **נדחה להמשך** לפי החלטת מוצר | לא בפריסה הנוכחית |
 | **5** | המלצות, מפה (אופציונלי), הכנה לאפליקציה | נפרד |

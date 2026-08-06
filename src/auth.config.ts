@@ -3,7 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 
 /**
- * Edge-safe auth config (no mongoose). Used by middleware + full auth.
+ * Edge-safe auth config (no DB imports). Used by middleware + full auth.
  */
 export const authConfig = {
   trustHost: true,

@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
+import { desc, eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { connectDb } from "@/lib/db";
-import { LeadModel } from "@/lib/models/Lead";
+import { leads } from "@/lib/db/schema";
 import { mapLead } from "@/lib/mappers";
-import mongoose from "mongoose";
 
 export async function GET() {
   const session = await auth();
@@ -12,9 +12,9 @@ export async function GET() {
   }
 
   try {
-    await connectDb();
-    const docs = await LeadModel.find().sort({ createdAt: -1 });
-    return NextResponse.json({ leads: docs.map(mapLead) });
+    const db = await connectDb();
+    const rows = await db.select().from(leads).orderBy(desc(leads.createdAt));
+    return NextResponse.json({ leads: rows.map(mapLead) });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Failed", leads: [] }, { status: 500 });
@@ -23,7 +23,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    await connectDb();
+    const db = await connectDb();
     const body = await req.json();
     const {
       type,
@@ -40,22 +40,29 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    const doc = await LeadModel.create({
-      type,
-      name,
-      phone,
-      message: message ?? null,
-      propertyId:
-        propertyId && mongoose.Types.ObjectId.isValid(propertyId)
-          ? propertyId
-          : null,
-      propertyTitle: propertyTitle ?? null,
-      propertyUrl: propertyUrl ?? null,
-      privacyConsentAt: new Date(privacyConsentAt),
-      status: "new",
-    });
+    const now = new Date();
+    const [row] = await db
+      .insert(leads)
+      .values({
+        id: crypto.randomUUID(),
+        type: String(type),
+        name: String(name),
+        phone: String(phone),
+        message: message != null ? String(message) : null,
+        propertyId:
+          typeof propertyId === "string" && propertyId.trim()
+            ? propertyId.trim()
+            : null,
+        propertyTitle: propertyTitle != null ? String(propertyTitle) : null,
+        propertyUrl: propertyUrl != null ? String(propertyUrl) : null,
+        privacyConsentAt: new Date(privacyConsentAt),
+        status: "new",
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
 
-    return NextResponse.json({ lead: mapLead(doc) }, { status: 201 });
+    return NextResponse.json({ lead: mapLead(row) }, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Failed to create lead" }, { status: 500 });

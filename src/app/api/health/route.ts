@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { hasMongoConfig } from "@/lib/db";
+import { hasDbConfig } from "@/lib/db";
 import { hasCloudinaryConfig } from "@/lib/cloudinary";
 
 export async function GET() {
   return NextResponse.json({
-    mongo: hasMongoConfig(),
+    db: hasDbConfig(),
     cloudinary: hasCloudinaryConfig(),
-    mode: hasMongoConfig() ? "server" : "demo",
+    mode: hasDbConfig() ? "server" : "demo",
   });
 }

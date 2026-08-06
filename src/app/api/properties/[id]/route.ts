@@ -1,30 +1,35 @@
 import { NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { connectDb } from "@/lib/db";
-import { PropertyModel } from "@/lib/models/Property";
-import { mapProperty } from "@/lib/mappers";
-import { toPublicProperty } from "@/lib/property-public";
-import { isArchivedPublicly, isListedPublicly } from "@/lib/property-public";
-import mongoose from "mongoose";
+import { properties } from "@/lib/db/schema";
+import { mapProperty, propertyValuesFromBody } from "@/lib/mappers";
+import {
+  isArchivedPublicly,
+  isListedPublicly,
+  toPublicProperty,
+} from "@/lib/property-public";
 
 type Ctx = { params: Promise<{ id: string }> };
 
 export async function GET(_req: Request, ctx: Ctx) {
   try {
     const { id } = await ctx.params;
-    if (!mongoose.Types.ObjectId.isValid(id) && !id.startsWith("p")) {
-      // still try find by id string for seed migration later
-    }
-    await connectDb();
+    const db = await connectDb();
     const session = await auth();
     const isAdmin = session?.user?.role === "admin";
 
-    const doc = await PropertyModel.findById(id);
-    if (!doc) {
+    const [row] = await db
+      .select()
+      .from(properties)
+      .where(eq(properties.id, id))
+      .limit(1);
+
+    if (!row) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    const property = mapProperty(doc);
+    const property = mapProperty(row);
     if (isAdmin) {
       return NextResponse.json({ property });
     }
@@ -52,38 +57,34 @@ export async function PUT(req: Request, ctx: Ctx) {
 
   try {
     const { id } = await ctx.params;
-    await connectDb();
-    const body = await req.json();
-    const {
-      id: _i,
-      createdAt: _c,
-      updatedAt: _u,
-      ...rest
-    } = body as Record<string, unknown>;
+    const db = await connectDb();
+    const body = (await req.json()) as Record<string, unknown>;
+    const values = propertyValuesFromBody(body);
 
-    if (rest.status === "published") {
-      const images = (rest.images as unknown[]) ?? [];
-      if (images.length < 1) {
+    if (values.status === "published") {
+      if (values.images.length < 1) {
         return NextResponse.json(
           { error: "cannot_publish_no_image" },
           { status: 400 },
         );
       }
-      if (!rest.publishedAt) rest.publishedAt = new Date();
+      values.publishedAt = values.publishedAt ?? new Date();
     }
 
-    if (rest.status === "sold" || rest.status === "rented") {
-      rest.archivedAt = new Date();
+    if (values.status === "sold" || values.status === "rented") {
+      values.archivedAt = values.archivedAt ?? new Date();
     }
 
-    const doc = await PropertyModel.findByIdAndUpdate(id, rest, {
-      new: true,
-      runValidators: true,
-    });
-    if (!doc) {
+    const [row] = await db
+      .update(properties)
+      .set({ ...values, updatedAt: new Date() })
+      .where(eq(properties.id, id))
+      .returning();
+
+    if (!row) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
-    return NextResponse.json({ property: mapProperty(doc) });
+    return NextResponse.json({ property: mapProperty(row) });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Failed to update" }, { status: 500 });
@@ -98,16 +99,17 @@ export async function DELETE(_req: Request, ctx: Ctx) {
 
   try {
     const { id } = await ctx.params;
-    await connectDb();
-    const doc = await PropertyModel.findByIdAndUpdate(
-      id,
-      { deletedAt: new Date() },
-      { new: true },
-    );
-    if (!doc) {
+    const db = await connectDb();
+    const [row] = await db
+      .update(properties)
+      .set({ deletedAt: new Date(), updatedAt: new Date() })
+      .where(eq(properties.id, id))
+      .returning();
+
+    if (!row) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
-    return NextResponse.json({ property: mapProperty(doc) });
+    return NextResponse.json({ property: mapProperty(row) });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Failed to delete" }, { status: 500 });
