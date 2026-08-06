@@ -7,7 +7,7 @@
 **https://alex-nekasim.vercel.app**
 
 פרטי קשר, רישיון תיווך, תמונה וטקסטים של אלכס גריביאן באוויר.  
-בוט AI — יתווסף בהמשך (לא בגרסה הנוכחית).
+כולל צ׳אט עזרה בעברית לשאלות על נכסים ועל אלכס.
 
 ---
 
@@ -28,10 +28,12 @@ npm run build
 
 | מצב | מתי | התנהגות |
 |-----|-----|---------|
-| **דמו** | אין `DATABASE_URL` | נתונים ב־localStorage של הדפדפן |
+| **מקומי** | אין `DATABASE_URL` | נתונים ב־localStorage של הדפדפן |
 | **שרת** | יש `DATABASE_URL` (+ Cloudinary להעלאות) | נתונים משותפים בשרת |
 
 `DATABASE_URL` = **Neon Postgres Free** — ראו [`docs/DATA_CHECKLIST.md`](docs/DATA_CHECKLIST.md) ו־[`docs/NEON_SETUP.md`](docs/NEON_SETUP.md).
+
+אופציונלי לצ׳אט LLM חינמי: `GROQ_API_KEY` (בלי זה הצ׳אט עובד במצב FAQ + נכסים מפורסמים).
 
 ## מסמכים
 

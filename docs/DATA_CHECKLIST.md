@@ -17,6 +17,8 @@
   מדריך מפורט: [`docs/NEON_SETUP.md`](./NEON_SETUP.md)
 
   (MongoDB Atlas Free לא תמיד מופיע בממשק — לכן עברנו ל־Neon.)
+- [ ] **Groq Free (אופציונלי)** לצ׳אט LLM חכם יותר → `GROQ_API_KEY`  
+  בלי זה הצ׳אט עובד במצב FAQ + נכסים מפורסמים. הרשמה: [console.groq.com](https://console.groq.com/)
 - [ ] **Cloudinary** (חינם) להעלאת תמונות מהטלפון:  
   `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
 - [x] **אימייל + סיסמאות שרת** (מוגדר ב־Vercel; לא ב־git)
