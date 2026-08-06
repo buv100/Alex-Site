@@ -11,6 +11,21 @@ export function formatPrice(price: number | null, currency = "ILS"): string {
   }).format(price);
 }
 
+/** Display helpers for money fields while typing: 1200000 → 1,200,000 */
+export function formatPriceInput(value: number | null | undefined): string {
+  if (value === null || value === undefined || Number.isNaN(value)) return "";
+  return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(
+    value,
+  );
+}
+
+export function parsePriceInput(raw: string): number | null {
+  const digits = raw.replace(/[^\d]/g, "");
+  if (!digits) return null;
+  const n = Number(digits);
+  return Number.isFinite(n) ? n : null;
+}
+
 export function dealTypeLabel(dealType: DealType): string {
   return dealType === "sale" ? "למכירה" : "להשכרה";
 }

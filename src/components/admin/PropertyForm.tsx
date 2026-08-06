@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useDemo } from "@/components/providers/DemoProvider";
 import { getAdminDict } from "@/lib/i18n/admin";
 import { fileToCompressedDataUrl } from "@/lib/client-image";
+import { formatPriceInput, parsePriceInput } from "@/lib/format";
 import { siteConfig } from "@/lib/site";
 import type { Property, PropertyType, DealType } from "@/lib/types";
 
@@ -166,15 +167,11 @@ export function PropertyForm({ initial }: { initial: Property }) {
           <label htmlFor="price">מחיר (ריק = צור קשר לבירור)</label>
           <input
             id="price"
-            type="number"
+            type="text"
             inputMode="numeric"
-            value={form.price ?? ""}
-            onChange={(e) =>
-              setField(
-                "price",
-                e.target.value === "" ? null : Number(e.target.value),
-              )
-            }
+            autoComplete="off"
+            value={formatPriceInput(form.price)}
+            onChange={(e) => setField("price", parsePriceInput(e.target.value))}
           />
         </div>
 
@@ -473,13 +470,12 @@ export function PropertyForm({ initial }: { initial: Property }) {
           <label htmlFor="minPrice">מחיר מינימום למו״מ</label>
           <input
             id="minPrice"
-            type="number"
-            value={form.minPriceNegotiable ?? ""}
+            type="text"
+            inputMode="numeric"
+            autoComplete="off"
+            value={formatPriceInput(form.minPriceNegotiable)}
             onChange={(e) =>
-              setField(
-                "minPriceNegotiable",
-                e.target.value === "" ? null : Number(e.target.value),
-              )
+              setField("minPriceNegotiable", parsePriceInput(e.target.value))
             }
           />
         </div>
